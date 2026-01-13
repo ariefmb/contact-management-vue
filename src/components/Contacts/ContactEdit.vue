@@ -1,26 +1,49 @@
 <script setup>
 import { alertError, alertSuccess } from '@/lib/alert'
-import { contactCreate } from '@/lib/api/ContactApi'
+import { contactGet, contactUpdate } from '@/lib/api/ContactApi'
 import { useLocalStorage } from '@vueuse/core'
-import { reactive } from 'vue'
-import { useRouter } from 'vue-router'
+import { onBeforeMount, reactive } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 
+const route = useRoute()
 const router = useRouter()
+
 const token = useLocalStorage('token', '')
+const contactId = route.params.contactId
 
 const contact = reactive({
+  id: contactId,
   first_name: '',
   last_name: '',
   email: '',
   phone: '',
 })
 
-const handleCreateContact = async () => {
-  const response = await contactCreate(token.value, contact)
+const fetchDetailContact = async () => {
+  const response = await contactGet(token.value, contactId)
   const responseBody = await response.json()
 
   if (response.status === 200) {
-    await alertSuccess('Success create new contact')
+    Object.assign(contact, {
+      id: responseBody.data.id,
+      first_name: responseBody.data.first_name,
+      last_name: responseBody.data.last_name,
+      email: responseBody.data.email,
+      phone: responseBody.data.phone.replace('(+62) ', ''),
+    })
+  } else {
+    await alertError(responseBody.errors)
+  }
+}
+
+onBeforeMount(fetchDetailContact)
+
+const handleEditContact = async () => {
+  const response = await contactUpdate(token.value, contactId, contact)
+  const responseBody = await response.json()
+
+  if (response.status === 200) {
+    await alertSuccess('Successfully edit contact data')
     router.push({
       path: '/dashboard/contacts',
     })
@@ -32,14 +55,14 @@ const handleCreateContact = async () => {
 
 <template>
   <div class="flex items-center mb-6">
-    <RouterLink
-      to="/dashboard/contacts"
+    <a
+      href="dashboard.html"
       class="text-blue-400 hover:text-blue-300 mr-4 flex items-center transition-colors duration-200"
     >
       <i class="fas fa-arrow-left mr-2"></i> Back to Contacts
-    </RouterLink>
+    </a>
     <h1 class="text-2xl font-bold text-white flex items-center">
-      <i class="fas fa-user-plus text-blue-400 mr-3"></i> Create New Contact
+      <i class="fas fa-user-edit text-blue-400 mr-3"></i> Edit Contact
     </h1>
   </div>
 
@@ -47,7 +70,7 @@ const handleCreateContact = async () => {
     class="bg-gray-800 bg-opacity-80 rounded-xl shadow-custom border border-gray-700 overflow-hidden max-w-2xl mx-auto animate-fade-in"
   >
     <div class="p-8">
-      <form @submit.prevent="handleCreateContact">
+      <form @submit.prevent="handleEditContact">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
           <div>
             <label for="first_name" class="block text-gray-300 text-sm font-medium mb-2"
@@ -115,7 +138,7 @@ const handleCreateContact = async () => {
               <p class="text-gray-500 font-bold">| +62</p>
             </div>
             <input
-              type="number"
+              type="tel"
               id="phone"
               name="phone"
               class="w-full pl-20 pr-3 py-3 bg-gray-700 bg-opacity-50 border border-gray-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
@@ -127,17 +150,18 @@ const handleCreateContact = async () => {
         </div>
 
         <div class="flex justify-end space-x-4">
-          <RouterLink
-            to="/dashboard/contacts"
-            class="px-5 py-3 bg-gray-700 text-white rounded-lg hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:ring-offset-gray-800 transition-all duration-200 flex items-center shadow-md"
+          <button
+            type="button"
+            @click="router.back()"
+            class="px-5 py-3 bg-gray-700 text-white rounded-lg hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:ring-offset-gray-800 transition-all duration-200 flex items-center shadow-md cursor-pointer"
           >
             <i class="fas fa-times mr-2"></i> Cancel
-          </RouterLink>
+          </button>
           <button
             type="submit"
             class="px-5 py-3 bg-gradient text-white rounded-lg hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-800 transition-all duration-200 font-medium shadow-lg transform hover:-translate-y-0.5 flex items-center cursor-pointer"
           >
-            <i class="fas fa-plus-circle mr-2"></i> Create Contact
+            <i class="fas fa-save mr-2"></i> Save Changes
           </button>
         </div>
       </form>

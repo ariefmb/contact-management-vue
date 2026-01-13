@@ -10,7 +10,9 @@ const name = ref('')
 const password = ref('')
 const confirmPassword = ref('')
 
-const fetchUsersData = async () => {
+watchEffect(async () => {
+  if (!token.value) return
+  
   const response = await userGet(token.value)
   const responseBody = await response.json()
 
@@ -19,7 +21,7 @@ const fetchUsersData = async () => {
   } else {
     await alertError(responseBody.errors)
   }
-}
+})
 
 const handleUpdateName = async () => {
   const response = await userUpdateName(token.value, { name: name.value })
@@ -50,8 +52,6 @@ const handleUpdatePassword = async () => {
     await alertError(responseBody.erros)
   }
 }
-
-watchEffect(async () => await fetchUsersData())
 </script>
 
 <template>
@@ -96,7 +96,7 @@ watchEffect(async () => await fetchUsersData())
           <div class="mt-6">
             <button
               type="submit"
-              class="w-full bg-gradient text-white py-3 px-4 rounded-lg hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-800 transition-all duration-200 font-medium shadow-lg transform hover:-translate-y-0.5 flex items-center justify-center"
+              class="w-full bg-gradient text-white py-3 px-4 rounded-lg hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-800 transition-all duration-200 font-medium shadow-lg transform hover:-translate-y-0.5 flex items-center justify-center cursor-pointer"
             >
               <i class="fas fa-save mr-2"></i> Update Profile
             </button>
@@ -162,7 +162,7 @@ watchEffect(async () => await fetchUsersData())
           <div class="mt-6">
             <button
               type="submit"
-              class="w-full bg-gradient text-white py-3 px-4 rounded-lg hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-800 transition-all duration-200 font-medium shadow-lg transform hover:-translate-y-0.5 flex items-center justify-center"
+              class="w-full bg-gradient text-white py-3 px-4 rounded-lg hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-800 transition-all duration-200 font-medium shadow-lg transform hover:-translate-y-0.5 flex items-center justify-center cursor-pointer"
             >
               <i class="fas fa-key mr-2"></i> Update Password
             </button>

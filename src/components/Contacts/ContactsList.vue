@@ -1,12 +1,22 @@
 <script setup>
 import { alertConfirm, alertError } from '@/lib/alert'
 import { contactGetList, contactRemove } from '@/lib/api/ContactApi'
-import { useLocalStorage } from '@vueuse/core'
+import { useLocalStorage, useUrlSearchParams } from '@vueuse/core'
 import { reactive, ref, watchEffect } from 'vue'
 import { onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
+const token = useLocalStorage('token', '')
+const searchParams = useUrlSearchParams()
+
+const search = reactive({
+  name: searchParams.name,
+  email: searchParams.email,
+  phone: searchParams.phone,
+  page: searchParams.page,
+})
+const contacts = ref([])
 
 onMounted(() => {
   const toggleButton = document.getElementById('toggleSearchForm')
@@ -40,30 +50,19 @@ onMounted(() => {
   })
 })
 
-const token = useLocalStorage('token', '')
-const search = reactive({
-  name: '',
-  email: '',
-  phone: '',
-})
-const page = 1
-
-const contacts = ref([])
-
 watchEffect(async () => {
-  const response = await contactGetList(token.value, {
-    name: search.name,
-    email: search.email,
-    phone: search.phone,
-    page: page,
-  })
+  if (!token.value) return
 
+  const response = await contactGetList(token.value, search)
   const responseBody = await response.json()
 
   if (response.status === 200) {
     contacts.value = responseBody.data
+    router.push({
+      query: search,
+    })
   } else {
-    await alertError('Failed to fetch contacts list')
+    await alertError(responseBody.errors)
   }
 })
 
@@ -109,56 +108,50 @@ const handleDeleteContact = async (contactId) => {
       <form>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
           <div>
-            <label for="search_name" class="block text-gray-300 text-sm font-medium mb-2"
-              >Name</label
-            >
+            <label for="name" class="block text-gray-300 text-sm font-medium mb-2">Name</label>
             <div class="relative">
               <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <i class="fas fa-user text-gray-500"></i>
               </div>
               <input
                 type="text"
-                id="search_name"
-                name="search_name"
+                id="name"
+                name="name"
                 class="w-full pl-10 pr-3 py-3 bg-gray-700 bg-opacity-50 border border-gray-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
                 placeholder="Search by name"
-                v-model="search.name"
+                v-model.lazy="search.name"
               />
             </div>
           </div>
           <div>
-            <label for="search_email" class="block text-gray-300 text-sm font-medium mb-2"
-              >Email</label
-            >
+            <label for="email" class="block text-gray-300 text-sm font-medium mb-2">Email</label>
             <div class="relative">
               <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <i class="fas fa-envelope text-gray-500"></i>
               </div>
               <input
                 type="text"
-                id="search_email"
-                name="search_email"
+                id="email"
+                name="email"
                 class="w-full pl-10 pr-3 py-3 bg-gray-700 bg-opacity-50 border border-gray-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
                 placeholder="Search by email"
-                v-model="search.email"
+                v-model.lazy="search.email"
               />
             </div>
           </div>
           <div>
-            <label for="search_phone" class="block text-gray-300 text-sm font-medium mb-2"
-              >Phone</label
-            >
+            <label for="phone" class="block text-gray-300 text-sm font-medium mb-2">Phone</label>
             <div class="relative">
               <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <i class="fas fa-phone text-gray-500"></i>
               </div>
               <input
                 type="text"
-                id="search_phone"
-                name="search_phone"
+                id="phone"
+                name="phone"
                 class="w-full pl-10 pr-3 py-3 bg-gray-700 bg-opacity-50 border border-gray-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
                 placeholder="Search by phone"
-                v-model="search.phone"
+                v-model.lazy="search.phone"
               />
             </div>
           </div>
@@ -166,7 +159,7 @@ const handleDeleteContact = async (contactId) => {
         <div class="mt-5 text-right">
           <button
             type="submit"
-            class="px-5 py-3 bg-gradient text-white rounded-lg hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-800 transition-all duration-200 font-medium shadow-lg transform hover:-translate-y-0.5"
+            class="px-5 py-3 bg-gradient text-white rounded-lg hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-800 transition-all duration-200 font-medium shadow-lg transform hover:-translate-y-0.5 cursor-pointer"
           >
             <i class="fas fa-search mr-2"></i> Search
           </button>
@@ -251,7 +244,7 @@ const handleDeleteContact = async (contactId) => {
             </RouterLink>
             <button
               @click="handleDeleteContact(contact.id)"
-              class="px-4 py-2 bg-linear-to-r from-red-600 to-red-500 text-white rounded-lg hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-gray-800 transition-all duration-200 font-medium shadow-md flex items-center"
+              class="px-4 py-2 bg-linear-to-r from-red-600 to-red-500 text-white rounded-lg hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-gray-800 transition-all duration-200 font-medium shadow-md flex items-center cursor-pointer"
             >
               <i class="fas fa-trash-alt mr-2"></i> Delete
             </button>

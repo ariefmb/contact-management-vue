@@ -1,4 +1,6 @@
 import ContactCreate from '@/components/Contacts/ContactCreate.vue'
+import ContactDetail from '@/components/Contacts/ContactDetail.vue'
+import ContactEdit from '@/components/Contacts/ContactEdit.vue'
 import ContactsList from '@/components/Contacts/ContactsList.vue'
 import UserLogin from '@/components/User/UserLogin.vue'
 import UserProfile from '@/components/User/UserProfile.vue'
@@ -43,6 +45,14 @@ const router = createRouter({
         {
           path: 'contacts/create',
           component: ContactCreate,
+        },
+        {
+          path: 'contacts/:contactId',
+          component: ContactDetail,
+        },
+        {
+          path: 'contacts/:contactId/edit',
+          component: ContactEdit,
         },
         {
           path: 'users/profile',

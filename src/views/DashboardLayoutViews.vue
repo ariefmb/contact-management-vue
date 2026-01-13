@@ -14,10 +14,10 @@ const handleLogoutButton = async () => {
       const responseBody = await response.json()
 
       if (response.status === 200) {
-        token.value = ''
-        router.push({
+        router.replace({
           path: '/login',
         })
+        token.value = ''
       } else {
         await alertError(responseBody.errors)
       }
