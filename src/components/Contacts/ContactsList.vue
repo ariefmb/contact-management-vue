@@ -93,15 +93,14 @@ const handleDeleteContact = async (contactId) => {
   <div
     class="bg-gray-800 bg-opacity-80 rounded-xl shadow-custom border border-gray-700 p-6 mb-8 animate-fade-in"
   >
-    <div class="flex items-center justify-between mb-4">
+    <div id="toggleSearchForm" class="flex items-center justify-between mb-4 cursor-pointer">
       <div class="flex items-center">
         <i class="fas fa-search text-blue-400 mr-3"></i>
         <h2 class="text-xl font-semibold text-white">Search Contacts</h2>
       </div>
       <button
         type="button"
-        id="toggleSearchForm"
-        class="text-gray-300 hover:text-white hover:bg-gray-700 p-2 rounded-full focus:outline-none transition-all duration-200"
+        class="text-gray-300 hover:text-white hover:bg-gray-700 p-2 rounded-full focus:outline-none transition-all duration-200 cursor-pointer"
       >
         <i class="fas fa-chevron-down text-lg" id="toggleSearchIcon"></i>
       </button>
