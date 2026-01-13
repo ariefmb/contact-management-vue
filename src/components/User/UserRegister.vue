@@ -21,7 +21,6 @@ const handleSubmit = async () => {
 
   const response = await userRegister(user)
   const responseBody = await response.json()
-  console.log(responseBody)
 
   if (response.status === 200) {
     await alertSuccess('User created successfully')
