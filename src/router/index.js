@@ -1,4 +1,5 @@
 import AddressAdd from '@/components/Addresses/AddressAdd.vue'
+import AddressEdit from '@/components/Addresses/AddressEdit.vue'
 import AddressesList from '@/components/Addresses/AddressesList.vue'
 import ContactCreate from '@/components/Contacts/ContactCreate.vue'
 import ContactDetail from '@/components/Contacts/ContactDetail.vue'
@@ -69,6 +70,10 @@ const router = createRouter({
         {
           path: 'contacts/:contactId/addresses/add',
           component: AddressAdd,
+        },
+        {
+          path: 'contacts/:contactId/addresses/:addressId/edit',
+          component: AddressEdit,
         },
       ],
     },

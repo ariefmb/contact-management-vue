@@ -48,11 +48,7 @@ export const contactGetList = async (token, { name, email, phone, page }) => {
   })
 }
 
-export const contactUpdate = async (
-  token,
-  contactId,
-  { id, first_name, last_name, email, phone },
-) => {
+export const contactUpdate = async (token, contactId, { first_name, last_name, email, phone }) => {
   phone = addPrefixCountryCode(phone)
 
   return await fetch(`${import.meta.env.VITE_API_PATH}/contacts/${contactId}`, {
@@ -63,7 +59,6 @@ export const contactUpdate = async (
       Authorization: token,
     },
     body: JSON.stringify({
-      id,
       first_name,
       last_name,
       email,

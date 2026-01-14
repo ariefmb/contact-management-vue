@@ -1,6 +1,6 @@
 <script setup>
 import { alertError, alertSuccess } from '@/lib/alert'
-import { addressAdd } from '@/lib/api/AddressApi'
+import { addressDetail, addressEdit } from '@/lib/api/AddressApi'
 import { contactGet } from '@/lib/api/ContactApi'
 import { useLocalStorage } from '@vueuse/core'
 import { onBeforeMount, reactive, ref } from 'vue'
@@ -30,25 +30,30 @@ const icons = ref([
   { title: 'Work Address', icon: '<i class="fas fa-building text-gray-500"></i>' },
 ])
 
-const route = useRoute()
 const router = useRouter()
+const route = useRoute()
 
 const token = useLocalStorage('token', '')
 const contactId = route.params.contactId
+const addressId = route.params.addressId
+
+console.log(`token ${token.value}, contactId ${contactId}, addressId ${addressId}`)
 
 const contact = reactive({
+  id: contactId,
   first_name: '',
   last_name: '',
   email: '',
   phone: '',
 })
 
-const fetchContactData = async () => {
+const fetchDetailContact = async () => {
   const response = await contactGet(token.value, contactId)
   const responseBody = await response.json()
 
   if (response.status === 200) {
     Object.assign(contact, {
+      id: responseBody.data.id,
       first_name: responseBody.data.first_name,
       last_name: responseBody.data.last_name,
       email: responseBody.data.email,
@@ -59,9 +64,8 @@ const fetchContactData = async () => {
   }
 }
 
-onBeforeMount(fetchContactData)
-
 const address = reactive({
+  id: addressId,
   title: '',
   street: '',
   city: '',
@@ -70,12 +74,41 @@ const address = reactive({
   postal_code: '',
 })
 
-const handleAddAddress = async () => {
-  const response = await addressAdd(token.value, contactId, address)
+const fetchDetailAddress = async () => {
+  const response = await addressDetail(token.value, contactId, addressId)
   const responseBody = await response.json()
 
+  console.log(responseBody);
+
+
   if (response.status === 200) {
-    await alertSuccess('Successfully add new address')
+    Object.assign(address, {
+      id: responseBody.data.id,
+      title: responseBody.data.title,
+      street: responseBody.data.street,
+      city: responseBody.data.city,
+      province: responseBody.data.province,
+      country: responseBody.data.country,
+      postal_code: responseBody.data.postal_code,
+    })
+  } else {
+    await alertError(responseBody.errors)
+  }
+}
+
+onBeforeMount(async () => {
+  await fetchDetailContact()
+  await fetchDetailAddress()
+})
+
+const handleEditAddress = async () => {
+  const response = await addressEdit(token.value, contactId, addressId, address)
+  const responseBody = await response.json()
+
+  console.log(responseBody)
+
+  if (response.status === 200) {
+    await alertSuccess('Successfully edit address data')
     router.push({
       path: `/dashboard/contacts/${contactId}`,
     })
@@ -87,14 +120,14 @@ const handleAddAddress = async () => {
 
 <template>
   <div class="flex items-center mb-6">
-    <RouterLink
-      :to="`/dashboard/contacts/${contactId}`"
+    <button
+      @click="router.back()"
       class="text-blue-400 hover:text-blue-300 mr-4 flex items-center transition-colors duration-200"
     >
       <i class="fas fa-arrow-left mr-2"></i> Back to Contact Details
-    </RouterLink>
+    </button>
     <h1 class="text-2xl font-bold text-white flex items-center">
-      <i class="fas fa-plus-circle text-blue-400 mr-3"></i> Add New Address
+      <i class="fas fa-map-marker-alt text-blue-400 mr-3"></i> Edit Address
     </h1>
   </div>
 
@@ -119,7 +152,7 @@ const handleAddAddress = async () => {
         </div>
       </div>
 
-      <form @submit.prevent="handleAddAddress">
+      <form @submit.prevent="handleEditAddress">
         <div class="mb-5">
           <label for="title" class="block text-gray-300 text-sm font-medium mb-2">Title</label>
           <div class="relative">
@@ -251,7 +284,6 @@ const handleAddAddress = async () => {
 
         <div class="flex justify-end space-x-4">
           <button
-            type="button"
             @click="router.back()"
             class="px-5 py-3 bg-gray-700 text-white rounded-lg hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:ring-offset-gray-800 transition-all duration-200 flex items-center shadow-md"
           >
@@ -261,7 +293,7 @@ const handleAddAddress = async () => {
             type="submit"
             class="px-5 py-3 bg-gradient text-white rounded-lg hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-800 transition-all duration-200 font-medium shadow-lg transform hover:-translate-y-0.5 flex items-center"
           >
-            <i class="fas fa-plus-circle mr-2"></i> Add Address
+            <i class="fas fa-save mr-2"></i> Save Changes
           </button>
         </div>
       </form>

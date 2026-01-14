@@ -55,12 +55,12 @@ const handleEditContact = async () => {
 
 <template>
   <div class="flex items-center mb-6">
-    <a
-      href="dashboard.html"
+    <button
+      @click="router.back()"
       class="text-blue-400 hover:text-blue-300 mr-4 flex items-center transition-colors duration-200"
     >
       <i class="fas fa-arrow-left mr-2"></i> Back to Contacts
-    </a>
+    </button>
     <h1 class="text-2xl font-bold text-white flex items-center">
       <i class="fas fa-user-edit text-blue-400 mr-3"></i> Edit Contact
     </h1>
