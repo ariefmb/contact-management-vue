@@ -1,21 +1,19 @@
 <script setup>
-import { alertConfirm, alertError } from '@/lib/alert'
+import { alertConfirm, alertError, alertSuccess } from '@/lib/alert'
 import { contactGetList, contactRemove } from '@/lib/api/ContactApi'
-import { useLocalStorage } from '@vueuse/core'
+import { useLocalStorage, useUrlSearchParams } from '@vueuse/core'
 import { onBeforeMount, reactive, ref, watch } from 'vue'
 import { onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 
+const searchParams = useUrlSearchParams()
 const router = useRouter()
 const token = useLocalStorage('token', '')
 
 const search = reactive({
-  // name: searchParams.name,
-  // email: searchParams.email,
-  // phone: searchParams.phone,
-  name: '',
-  email: '',
-  phone: '',
+  name: searchParams.name,
+  email: searchParams.email,
+  phone: searchParams.phone,
 })
 
 const page = ref(1)
@@ -32,6 +30,22 @@ watch(totalPage, (value) => {
   pages.value = data
 })
 
+const handleDeleteContact = async (contactId) => {
+  await alertConfirm('This contact will be remove!', 'Yes, remove it').then(async (result) => {
+    if (result.isConfirmed) {
+      const response = await contactRemove(token.value, contactId)
+      const responseBody = await response.json()
+
+      if (response.status === 200) {
+        await alertSuccess('Successfully remove contact')
+        await fetchContactsList()
+      } else {
+        await alertError(responseBody.errors)
+      }
+    }
+  })
+}
+
 const fetchContactsList = async () => {
   if (!token.value) return
 
@@ -43,8 +57,6 @@ const fetchContactsList = async () => {
   })
 
   const responseBody = await response.json()
-
-  console.log(responseBody)
 
   if (response.status === 200) {
     contacts.value = responseBody.data
@@ -59,33 +71,23 @@ const handleChangePage = async (value) => {
   await fetchContactsList()
 }
 
-const handleSearch = async (search) => {
+const handleSearch = async () => {
   page.value = 1
   await fetchContactsList()
 
+  const query = {}
+  if (search.name) query.name = search.name
+  if (search.email) query.email = search.email
+  if (search.phone) query.phone = search.phone
+
   router.push({
-    query: search,
+    query,
   })
 }
 
 onBeforeMount(async () => {
   await fetchContactsList()
 })
-
-const handleDeleteContact = async (contactId) => {
-  await alertConfirm('This contact will be remove!', 'Yes, remove it').then(async (result) => {
-    if (result.isConfirmed) {
-      const response = await contactRemove(token.value, contactId)
-      const responseBody = await response.json()
-
-      if (response.status === 200) {
-        router.go()
-      } else {
-        await alertError(responseBody.errors)
-      }
-    }
-  })
-}
 
 onMounted(() => {
   const toggleButton = document.getElementById('toggleSearchForm')
@@ -140,7 +142,7 @@ onMounted(() => {
       </button>
     </div>
     <div id="searchFormContent" class="mt-4">
-      <form @click.prevent="() => handleSearch(search)">
+      <form @submit.prevent="handleSearch">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
           <div>
             <label for="name" class="block text-gray-300 text-sm font-medium mb-2">Name</label>
@@ -222,7 +224,7 @@ onMounted(() => {
       </RouterLink>
     </div>
 
-    <!-- Contact Card 1 -->
+    <!-- Contact Card -->
     <template v-if="contacts.length !== 0">
       <div
         class="bg-gray-800 bg-opacity-80 rounded-xl shadow-custom border border-gray-700 overflow-hidden card-hover animate-fade-in"
