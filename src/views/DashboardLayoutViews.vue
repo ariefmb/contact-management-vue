@@ -1,5 +1,5 @@
 <script setup>
-import { alertConfirm, alertError } from '@/lib/alert'
+import { alertConfirm, alertError, alertSuccess } from '@/lib/alert'
 import { userLogout } from '@/lib/api/UserApi'
 import { useLocalStorage } from '@vueuse/core'
 import { useRouter } from 'vue-router'
@@ -14,6 +14,7 @@ const handleLogoutButton = async () => {
       const responseBody = await response.json()
 
       if (response.status === 200) {
+        await alertSuccess('You will be directed to the Login Page')
         router.replace({
           path: '/login',
         })
