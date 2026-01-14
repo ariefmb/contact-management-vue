@@ -1,3 +1,5 @@
+import AddressAdd from '@/components/Addresses/AddressAdd.vue'
+import AddressesList from '@/components/Addresses/AddressesList.vue'
 import ContactCreate from '@/components/Contacts/ContactCreate.vue'
 import ContactDetail from '@/components/Contacts/ContactDetail.vue'
 import ContactEdit from '@/components/Contacts/ContactEdit.vue'
@@ -35,6 +37,10 @@ const router = createRouter({
       path: '/dashboard',
       children: [
         {
+          path: 'users/profile',
+          component: UserProfile,
+        },
+        {
           path: '',
           component: ContactsList,
         },
@@ -49,14 +55,20 @@ const router = createRouter({
         {
           path: 'contacts/:contactId',
           component: ContactDetail,
+          children: [
+            {
+              path: '',
+              component: AddressesList,
+            },
+          ],
         },
         {
           path: 'contacts/:contactId/edit',
           component: ContactEdit,
         },
         {
-          path: 'users/profile',
-          component: UserProfile,
+          path: 'contacts/:contactId/addresses/add',
+          component: AddressAdd,
         },
       ],
     },
