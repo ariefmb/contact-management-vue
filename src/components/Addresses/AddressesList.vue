@@ -62,7 +62,7 @@ const fetchAddressesList = async () => {
       isLoading.value = false
     }, 1000)
   } catch (error) {
-    console.info(error.message)
+    console.error(error.message)
   }
 }
 

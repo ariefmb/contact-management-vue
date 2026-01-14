@@ -28,7 +28,9 @@ const fetchDetailContact = async () => {
   }
 }
 
-onBeforeMount(async () => await fetchDetailContact())
+onBeforeMount(async () => {
+  await fetchDetailContact()
+})
 </script>
 
 <template>

@@ -30,6 +30,9 @@ const icons = ref([
   { title: 'Work Address', icon: '<i class="fas fa-building text-gray-500"></i>' },
 ])
 
+const isLoading = ref(false)
+const isFetchingContactData = ref(false)
+const isFetchingAddressData = ref(false)
 const router = useRouter()
 const route = useRoute()
 
@@ -46,10 +49,17 @@ const contact = reactive({
 })
 
 const fetchDetailContact = async () => {
-  const response = await contactGet(token.value, contactId)
-  const responseBody = await response.json()
+  try {
+    isFetchingContactData.value = true
 
-  if (response.status === 200) {
+    const response = await contactGet(token.value, contactId)
+    const responseBody = await response.json()
+
+    if (response.status !== 200) {
+      await alertError(responseBody.errors)
+      return
+    }
+
     Object.assign(contact, {
       id: responseBody.data.id,
       first_name: responseBody.data.first_name,
@@ -57,8 +67,10 @@ const fetchDetailContact = async () => {
       email: responseBody.data.email,
       phone: responseBody.data.phone,
     })
-  } else {
-    await alertError(responseBody.errors)
+  } catch (error) {
+    console.error(error.message)
+  } finally {
+    isFetchingContactData.value = false
   }
 }
 
@@ -73,10 +85,17 @@ const address = reactive({
 })
 
 const fetchDetailAddress = async () => {
-  const response = await addressDetail(token.value, contactId, addressId)
-  const responseBody = await response.json()
+  try {
+    isFetchingAddressData.value = true
 
-  if (response.status === 200) {
+    const response = await addressDetail(token.value, contactId, addressId)
+    const responseBody = await response.json()
+
+    if (response.status !== 200) {
+      await alertError(responseBody.errors)
+      return
+    }
+
     Object.assign(address, {
       id: responseBody.data.id,
       title: responseBody.data.title,
@@ -86,8 +105,10 @@ const fetchDetailAddress = async () => {
       country: responseBody.data.country,
       postal_code: responseBody.data.postal_code,
     })
-  } else {
-    await alertError(responseBody.errors)
+  } catch (error) {
+    console.error(error.message)
+  } finally {
+    isFetchingAddressData.value = false
   }
 }
 
@@ -97,16 +118,25 @@ onBeforeMount(async () => {
 })
 
 const handleEditAddress = async () => {
-  const response = await addressEdit(token.value, contactId, addressId, address)
-  const responseBody = await response.json()
+  try {
+    isLoading.value = true
 
-  if (response.status === 200) {
+    const response = await addressEdit(token.value, contactId, addressId, address)
+    const responseBody = await response.json()
+
+    if (response.status !== 200) {
+      await alertError(responseBody.errors)
+      return
+    }
+
     await alertSuccess('Successfully edit address data')
     router.push({
       path: `/dashboard/contacts/${contactId}`,
     })
-  } else {
-    await alertError(responseBody.errors)
+  } catch (error) {
+    console.error(error.message)
+  } finally {
+    isLoading.value = false
   }
 }
 </script>
@@ -145,7 +175,7 @@ const handleEditAddress = async () => {
         </div>
       </div>
 
-      <form @submit.prevent="handleEditAddress">
+      <form @submit.prevent="() => handleEditAddress()">
         <div class="mb-5">
           <label for="title" class="block text-gray-300 text-sm font-medium mb-2">Title</label>
           <div class="relative">
@@ -277,6 +307,7 @@ const handleEditAddress = async () => {
 
         <div class="flex justify-end space-x-4">
           <button
+            type="button"
             @click="router.back()"
             class="px-5 py-3 bg-gray-700 text-white rounded-lg hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:ring-offset-gray-800 transition-all duration-200 flex items-center shadow-md"
           >
@@ -285,8 +316,32 @@ const handleEditAddress = async () => {
           <button
             type="submit"
             class="px-5 py-3 bg-gradient text-white rounded-lg hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-800 transition-all duration-200 font-medium shadow-lg transform hover:-translate-y-0.5 flex items-center"
+            :disabled="isLoading"
           >
-            <i class="fas fa-save mr-2"></i> Save Changes
+            <span v-if="isLoading" class="flex items-center justify-center">
+              <svg
+                class="mr-3 size-5 animate-spin text-white"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  class="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  stroke-width="4"
+                ></circle>
+                <path
+                  class="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                ></path>
+              </svg>
+              Saving...
+            </span>
+            <span v-else> <i class="fas fa-save mr-2"></i> Save Changes </span>
           </button>
         </div>
       </form>

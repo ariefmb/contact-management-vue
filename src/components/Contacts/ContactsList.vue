@@ -6,6 +6,8 @@ import { onBeforeMount, reactive, ref, watch } from 'vue'
 import { onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 
+const isSearching = ref(false)
+const isLoading = ref(false)
 const searchParams = useUrlSearchParams()
 const router = useRouter()
 const token = useLocalStorage('token', '')
@@ -31,38 +33,49 @@ watch(totalPage, (value) => {
 })
 
 const handleDeleteContact = async (contactId) => {
-  await alertConfirm('This contact will be remove!', 'Yes, remove it').then(async (result) => {
-    if (result.isConfirmed) {
-      const response = await contactRemove(token.value, contactId)
-      const responseBody = await response.json()
+  try {
+    await alertConfirm('This contact will be remove!', 'Yes, remove it').then(async (result) => {
+      if (result.isConfirmed) {
+        const response = await contactRemove(token.value, contactId)
+        const responseBody = await response.json()
 
-      if (response.status === 200) {
-        await alertSuccess('Successfully remove contact')
-        await fetchContactsList()
-      } else {
-        await alertError(responseBody.errors)
+        if (response.status === 200) {
+          await alertSuccess('Successfully remove contact')
+          isLoading.value = true
+          await fetchContactsList()
+          isLoading.value = false
+        } else {
+          await alertError(responseBody.errors)
+        }
       }
-    }
-  })
+    })
+  } catch (error) {
+    console.error(error.message)
+  }
 }
 
 const fetchContactsList = async () => {
-  if (!token.value) return
+  try {
+    if (!token.value) return
 
-  const response = await contactGetList(token.value, {
-    name: search.name,
-    email: search.email,
-    phone: search.phone,
-    page: page.value,
-  })
+    const response = await contactGetList(token.value, {
+      name: search.name,
+      email: search.email,
+      phone: search.phone,
+      page: page.value,
+    })
 
-  const responseBody = await response.json()
+    const responseBody = await response.json()
 
-  if (response.status === 200) {
+    if (response.status !== 200) {
+      await alertError(responseBody.errors)
+      return
+    }
+
     contacts.value = responseBody.data
     totalPage.value = responseBody.paging.total_page
-  } else {
-    await alertError(responseBody.errors)
+  } catch (error) {
+    console.error(error.message)
   }
 }
 
@@ -72,21 +85,33 @@ const handleChangePage = async (value) => {
 }
 
 const handleSearch = async () => {
-  page.value = 1
-  await fetchContactsList()
+  try {
+    isSearching.value = true
+    isLoading.value = true
 
-  const query = {}
-  if (search.name) query.name = search.name
-  if (search.email) query.email = search.email
-  if (search.phone) query.phone = search.phone
+    page.value = 1
+    await fetchContactsList()
 
-  router.push({
-    query,
-  })
+    const query = {}
+    if (search.name) query.name = search.name
+    if (search.email) query.email = search.email
+    if (search.phone) query.phone = search.phone
+
+    router.push({
+      query,
+    })
+  } catch (error) {
+    console.error(error.message)
+  } finally {
+    isSearching.value = false
+    isLoading.value = false
+  }
 }
 
 onBeforeMount(async () => {
+  isLoading.value = true
   await fetchContactsList()
+  isLoading.value = false
 })
 
 onMounted(() => {
@@ -197,8 +222,32 @@ onMounted(() => {
           <button
             type="submit"
             class="px-5 py-3 bg-gradient text-white rounded-lg hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-800 transition-all duration-200 font-medium shadow-lg transform hover:-translate-y-0.5 cursor-pointer"
+            :disabled="isSearching"
           >
-            <i class="fas fa-search mr-2"></i> Search
+            <span v-if="isSearching" class="flex items-center justify-center">
+              <svg
+                class="mr-3 size-5 animate-spin text-white"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  class="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  stroke-width="4"
+                ></circle>
+                <path
+                  class="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                ></path>
+              </svg>
+              Searching...
+            </span>
+            <span v-else> <i class="fas fa-search mr-2"></i> Search </span>
           </button>
         </div>
       </form>
@@ -296,35 +345,47 @@ onMounted(() => {
     <nav
       class="flex items-center space-x-3 bg-gray-800 bg-opacity-80 rounded-xl shadow-custom border border-gray-700 p-3 animate-fade-in"
     >
-      <a
-        @click="() => handleChangePage(page - 1)"
-        href="#"
-        class="px-4 py-2 bg-gray-700 text-gray-300 rounded-lg hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-800 transition-all duration-200 flex items-center"
-        v-if="page > 1"
-      >
-        <i class="fas fa-chevron-left mr-2"></i> Previous
-      </a>
-      <a
-        v-for="(value, index) in pages"
-        :key="index"
-        @click="() => handleChangePage(value)"
-        href="#"
-        :class="[
-          page === value
-            ? 'px-4 py-2 bg-gradient text-white rounded-lg hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-800 transition-all duration-200 font-medium shadow-md'
-            : 'px-4 py-2 bg-gray-700 text-gray-300 rounded-lg hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-800 transition-all duration-200',
-        ]"
-      >
-        {{ value }}
-      </a>
-      <a
-        @click="() => handleChangePage(page + 1)"
-        href="#"
-        class="px-4 py-2 bg-gray-700 text-gray-300 rounded-lg hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-800 transition-all duration-200 flex items-center"
-        v-if="page < totalPage"
-      >
-        Next <i class="fas fa-chevron-right ml-2"></i>
-      </a>
+      <template v-if="isLoading">
+        <div
+          class="px-4 py-2 bg-gray-700 text-gray-300 rounded-lg hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-800 transition-all duration-200"
+        >
+          1
+        </div>
+        <div
+          class="px-4 py-2 bg-gray-700 text-gray-300 rounded-lg hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-800 transition-all duration-200"
+        >
+          ...
+        </div>
+      </template>
+
+      <template v-else>
+        <button
+          @click="handleChangePage(page - 1)"
+          class="px-4 py-2 bg-gray-700 text-gray-300 rounded-lg hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-800 transition-all duration-200 flex items-center"
+          v-if="page > 1"
+        >
+          <i class="fas fa-chevron-left mr-2"></i> Previous
+        </button>
+        <button
+          v-for="(value, index) in pages"
+          :key="index"
+          @click="handleChangePage(value)"
+          :class="[
+            page === value
+              ? 'px-4 py-2 bg-gradient text-white rounded-lg hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-800 transition-all duration-200 font-medium shadow-md'
+              : 'px-4 py-2 bg-gray-700 text-gray-300 rounded-lg hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-800 transition-all duration-200',
+          ]"
+        >
+          {{ value }}
+        </button>
+        <button
+          @click="handleChangePage(page + 1)"
+          class="px-4 py-2 bg-gray-700 text-gray-300 rounded-lg hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-800 transition-all duration-200 flex items-center"
+          v-if="page < totalPage"
+        >
+          Next <i class="fas fa-chevron-right ml-2"></i>
+        </button>
+      </template>
     </nav>
   </div>
 </template>
