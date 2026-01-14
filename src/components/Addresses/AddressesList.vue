@@ -6,8 +6,16 @@ import { ref, watchEffect } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 const icons = ref([
-  { title: 'Home Address', icon: '<i class="fas fa-home text-white"></i>', backgrounColor: 'bg-blue-500' },
-  { title: 'Work Address', icon: '<i class="fas fa-building text-white"></i>', backgrounColor: 'bg-purple-500' },
+  {
+    title: 'Home Address',
+    icon: '<i class="fas fa-home text-white"></i>',
+    backgrounColor: 'bg-blue-500',
+  },
+  {
+    title: 'Work Address',
+    icon: '<i class="fas fa-building text-white"></i>',
+    backgrounColor: 'bg-purple-500',
+  },
 ])
 
 const route = useRoute()
@@ -24,8 +32,6 @@ watchEffect(async () => {
   const response = await addressesList(token.value, contactId)
   const responseBody = await response.json()
 
-  console.log(responseBody)
-
   if (response.status === 200) {
     addresses.value = responseBody.data
   } else {
@@ -34,14 +40,10 @@ watchEffect(async () => {
 })
 
 const handleRemoveAddress = async (addressId) => {
-  console.log('addressId', addressId)
-
   await alertConfirm('This address will be remove!', 'Yes, remove it').then(async (result) => {
     if (result.isConfirmed) {
       const response = await addressRemove(token.value, contactId, addressId)
       const responseBody = await response.json()
-
-      console.log(responseBody)
 
       if (response.status === 200) {
         await alertSuccess('Successfully remove address')

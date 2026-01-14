@@ -36,7 +36,7 @@ const fetchDetailContact = async () => {
   }
 }
 
-onBeforeMount(fetchDetailContact)
+onBeforeMount(async () => await fetchDetailContact())
 
 const handleEditContact = async () => {
   const response = await contactUpdate(token.value, contactId, contact)

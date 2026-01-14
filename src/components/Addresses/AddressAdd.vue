@@ -59,7 +59,7 @@ const fetchContactData = async () => {
   }
 }
 
-onBeforeMount(fetchContactData)
+onBeforeMount(async () => await fetchContactData())
 
 const address = reactive({
   title: '',

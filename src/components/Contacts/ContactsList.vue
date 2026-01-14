@@ -1,69 +1,75 @@
 <script setup>
 import { alertConfirm, alertError } from '@/lib/alert'
 import { contactGetList, contactRemove } from '@/lib/api/ContactApi'
-import { useLocalStorage, useUrlSearchParams } from '@vueuse/core'
-import { reactive, ref, watchEffect } from 'vue'
+import { useLocalStorage } from '@vueuse/core'
+import { onBeforeMount, reactive, ref, watch } from 'vue'
 import { onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
 const token = useLocalStorage('token', '')
-const searchParams = useUrlSearchParams()
 
 const search = reactive({
-  name: searchParams.name,
-  email: searchParams.email,
-  phone: searchParams.phone,
-  page: searchParams.page,
+  // name: searchParams.name,
+  // email: searchParams.email,
+  // phone: searchParams.phone,
+  name: '',
+  email: '',
+  phone: '',
 })
+
+const page = ref(1)
+const totalPage = ref(1)
+const pages = ref([])
+
 const contacts = ref([])
 
-onMounted(() => {
-  const toggleButton = document.getElementById('toggleSearchForm')
-  const searchFormContent = document.getElementById('searchFormContent')
-  const toggleIcon = document.getElementById('toggleSearchIcon')
-
-  // Add transition for smooth animation
-  searchFormContent.style.transition =
-    'max-height 0.3s ease-in-out, opacity 0.3s ease-in-out, margin 0.3s ease-in-out'
-  searchFormContent.style.overflow = 'hidden'
-  searchFormContent.style.maxHeight = '0px'
-  searchFormContent.style.opacity = '0'
-  searchFormContent.style.marginTop = '0'
-
-  toggleButton.addEventListener('click', function () {
-    if (searchFormContent.style.maxHeight !== '0px') {
-      // Hide the form
-      searchFormContent.style.maxHeight = '0px'
-      searchFormContent.style.opacity = '0'
-      searchFormContent.style.marginTop = '0'
-      toggleIcon.classList.remove('fa-chevron-up')
-      toggleIcon.classList.add('fa-chevron-down')
-    } else {
-      // Show the form
-      searchFormContent.style.maxHeight = searchFormContent.scrollHeight + 'px'
-      searchFormContent.style.opacity = '1'
-      searchFormContent.style.marginTop = '1rem'
-      toggleIcon.classList.remove('fa-chevron-down')
-      toggleIcon.classList.add('fa-chevron-up')
-    }
-  })
+watch(totalPage, (value) => {
+  const data = []
+  for (let i = 1; i <= value; i++) {
+    data.push(i)
+  }
+  pages.value = data
 })
 
-watchEffect(async () => {
+const fetchContactsList = async () => {
   if (!token.value) return
 
-  const response = await contactGetList(token.value, search)
+  const response = await contactGetList(token.value, {
+    name: search.name,
+    email: search.email,
+    phone: search.phone,
+    page: page.value,
+  })
+
   const responseBody = await response.json()
+
+  console.log(responseBody)
 
   if (response.status === 200) {
     contacts.value = responseBody.data
-    router.push({
-      query: search,
-    })
+    totalPage.value = responseBody.paging.total_page
   } else {
     await alertError(responseBody.errors)
   }
+}
+
+const handleChangePage = async (value) => {
+  page.value = value
+  await fetchContactsList()
+}
+
+const handleSearch = async (search) => {
+  page.value = 1
+  await fetchContactsList()
+
+  router.push({
+    query: search,
+  })
+}
+
+onBeforeMount(async () => {
+  await fetchContactsList()
 })
 
 const handleDeleteContact = async (contactId) => {
@@ -80,6 +86,35 @@ const handleDeleteContact = async (contactId) => {
     }
   })
 }
+
+onMounted(() => {
+  const toggleButton = document.getElementById('toggleSearchForm')
+  const searchFormContent = document.getElementById('searchFormContent')
+  const toggleIcon = document.getElementById('toggleSearchIcon')
+
+  searchFormContent.style.transition =
+    'max-height 0.3s ease-in-out, opacity 0.3s ease-in-out, margin 0.3s ease-in-out'
+  searchFormContent.style.overflow = 'hidden'
+  searchFormContent.style.maxHeight = '0px'
+  searchFormContent.style.opacity = '0'
+  searchFormContent.style.marginTop = '0'
+
+  toggleButton.addEventListener('click', function () {
+    if (searchFormContent.style.maxHeight !== '0px') {
+      searchFormContent.style.maxHeight = '0px'
+      searchFormContent.style.opacity = '0'
+      searchFormContent.style.marginTop = '0'
+      toggleIcon.classList.remove('fa-chevron-up')
+      toggleIcon.classList.add('fa-chevron-down')
+    } else {
+      searchFormContent.style.maxHeight = searchFormContent.scrollHeight + 'px'
+      searchFormContent.style.opacity = '1'
+      searchFormContent.style.marginTop = '1rem'
+      toggleIcon.classList.remove('fa-chevron-down')
+      toggleIcon.classList.add('fa-chevron-up')
+    }
+  })
+})
 </script>
 
 <template>
@@ -105,7 +140,7 @@ const handleDeleteContact = async (contactId) => {
       </button>
     </div>
     <div id="searchFormContent" class="mt-4">
-      <form>
+      <form @click.prevent="() => handleSearch(search)">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
           <div>
             <label for="name" class="block text-gray-300 text-sm font-medium mb-2">Name</label>
@@ -260,32 +295,31 @@ const handleDeleteContact = async (contactId) => {
       class="flex items-center space-x-3 bg-gray-800 bg-opacity-80 rounded-xl shadow-custom border border-gray-700 p-3 animate-fade-in"
     >
       <a
+        @click="() => handleChangePage(page - 1)"
         href="#"
         class="px-4 py-2 bg-gray-700 text-gray-300 rounded-lg hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-800 transition-all duration-200 flex items-center"
+        v-if="page > 1"
       >
         <i class="fas fa-chevron-left mr-2"></i> Previous
       </a>
       <a
+        v-for="(value, index) in pages"
+        :key="index"
+        @click="() => handleChangePage(value)"
         href="#"
-        class="px-4 py-2 bg-gradient text-white rounded-lg hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-800 transition-all duration-200 font-medium shadow-md"
+        :class="[
+          page === value
+            ? 'px-4 py-2 bg-gradient text-white rounded-lg hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-800 transition-all duration-200 font-medium shadow-md'
+            : 'px-4 py-2 bg-gray-700 text-gray-300 rounded-lg hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-800 transition-all duration-200',
+        ]"
       >
-        1
+        {{ value }}
       </a>
       <a
-        href="#"
-        class="px-4 py-2 bg-gray-700 text-gray-300 rounded-lg hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-800 transition-all duration-200"
-      >
-        2
-      </a>
-      <a
-        href="#"
-        class="px-4 py-2 bg-gray-700 text-gray-300 rounded-lg hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-800 transition-all duration-200"
-      >
-        3
-      </a>
-      <a
+        @click="() => handleChangePage(page + 1)"
         href="#"
         class="px-4 py-2 bg-gray-700 text-gray-300 rounded-lg hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-800 transition-all duration-200 flex items-center"
+        v-if="page < totalPage"
       >
         Next <i class="fas fa-chevron-right ml-2"></i>
       </a>

@@ -37,8 +37,6 @@ const token = useLocalStorage('token', '')
 const contactId = route.params.contactId
 const addressId = route.params.addressId
 
-console.log(`token ${token.value}, contactId ${contactId}, addressId ${addressId}`)
-
 const contact = reactive({
   id: contactId,
   first_name: '',
@@ -78,9 +76,6 @@ const fetchDetailAddress = async () => {
   const response = await addressDetail(token.value, contactId, addressId)
   const responseBody = await response.json()
 
-  console.log(responseBody);
-
-
   if (response.status === 200) {
     Object.assign(address, {
       id: responseBody.data.id,
@@ -104,8 +99,6 @@ onBeforeMount(async () => {
 const handleEditAddress = async () => {
   const response = await addressEdit(token.value, contactId, addressId, address)
   const responseBody = await response.json()
-
-  console.log(responseBody)
 
   if (response.status === 200) {
     await alertSuccess('Successfully edit address data')
