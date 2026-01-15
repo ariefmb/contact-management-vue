@@ -38,6 +38,7 @@ export const contactGetList = async (token, { name, email, phone, page }) => {
   if (email) url.searchParams.append('email', email)
   if (phone) url.searchParams.append('phone', phone)
   if (page) url.searchParams.append('page', page)
+  url.searchParams.append('size', 5)
 
   return await fetch(url, {
     method: 'GET',

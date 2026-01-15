@@ -5,6 +5,9 @@ import ContactCreate from '@/components/Contacts/ContactCreate.vue'
 import ContactDetail from '@/components/Contacts/ContactDetail.vue'
 import ContactEdit from '@/components/Contacts/ContactEdit.vue'
 import ContactsList from '@/components/Contacts/ContactsList.vue'
+import GuestAddressesList from '@/components/Guest/GuestAddressesList.vue'
+import GuestContactDetail from '@/components/Guest/GuestContactDetail.vue'
+import GuestContactList from '@/components/Guest/GuestContactList.vue'
 import UserLogin from '@/components/User/UserLogin.vue'
 import UserProfile from '@/components/User/UserProfile.vue'
 import UserRegister from '@/components/User/UserRegister.vue'
@@ -21,7 +24,17 @@ const router = createRouter({
       children: [
         {
           path: '',
-          component: UserLogin,
+          component: GuestContactList,
+        },
+        {
+          path: '/guest/contacts/:contactId',
+          component: GuestContactDetail,
+          children: [
+            {
+              path: '',
+              component: GuestAddressesList,
+            },
+          ],
         },
         {
           path: '/register',
