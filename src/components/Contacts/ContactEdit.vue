@@ -29,8 +29,6 @@ const fetchDetailContact = async () => {
       return
     }
 
-    console.log(response)
-
     Object.assign(contact, {
       id: response.data.id,
       first_name: response.data.first_name,

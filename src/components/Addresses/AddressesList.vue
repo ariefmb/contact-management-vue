@@ -1,7 +1,6 @@
 <script setup>
-import { addressesList, addressRemove } from '@/lib/api/AddressApi'
+import { addressesRetrieveDatas, addressRemove } from '@/lib/api/AddressApi'
 import { alertConfirm, alertError, alertSuccess } from '@/lib/utils/alert'
-import { useLocalStorage } from '@vueuse/core'
 import { onBeforeMount, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
@@ -23,40 +22,36 @@ const isLoading = ref(false)
 const route = useRoute()
 const router = useRouter()
 
-const accessToken = useLocalStorage('accessToken', '')
 const contactId = route.params.contactId
-
 const addresses = ref([])
 
 const handleRemoveAddress = async (addressId) => {
   await alertConfirm('This address will be remove!', 'Yes, remove it').then(async (result) => {
     if (result.isConfirmed) {
-      const response = await addressRemove(accessToken.value, contactId, addressId)
-      const responseBody = await response.json()
+      const response = await addressRemove(contactId, addressId)
 
-      if (response.status === 200) {
-        await alertSuccess('Successfully remove address')
-        router.go()
-      } else {
-        await alertError(responseBody.errors)
+      if (!response.status) {
+        await alertError(response.errors)
+        return
       }
+
+      await alertSuccess('Successfully remove address')
+      router.go()
     }
   })
 }
 
 const fetchAddressesList = async () => {
   try {
-    if (!accessToken.value) return
-
     isLoading.value = true
-    const response = await addressesList(accessToken.value, contactId)
-    const responseBody = await response.json()
+    const response = await addressesRetrieveDatas(contactId)
 
-    if (response.status !== 200) {
-      return await alertError(responseBody.errors)
+    if (!response.status) {
+      await alertError(response.errors)
+      return
     }
 
-    addresses.value = responseBody.data
+    addresses.value = response.data
 
     setTimeout(() => {
       isLoading.value = false

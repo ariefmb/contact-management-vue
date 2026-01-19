@@ -29,7 +29,8 @@ const fetchAddressesList = async () => {
     const responseBody = await response.json()
 
     if (response.status !== 200) {
-      return await alertError(responseBody.errors)
+      await alertError(responseBody.errors)
+      return
     }
 
     addresses.value = responseBody.data

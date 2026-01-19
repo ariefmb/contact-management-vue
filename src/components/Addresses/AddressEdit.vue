@@ -2,7 +2,6 @@
 import { addressDetail, addressEdit } from '@/lib/api/AddressApi'
 import { contactRetrieveData } from '@/lib/api/ContactApi'
 import { alertError, alertSuccess } from '@/lib/utils/alert'
-import { useLocalStorage } from '@vueuse/core'
 import { onBeforeMount, reactive, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
@@ -33,10 +32,10 @@ const icons = ref([
 const isLoading = ref(false)
 const isFetchingContactData = ref(false)
 const isFetchingAddressData = ref(false)
+
 const router = useRouter()
 const route = useRoute()
 
-const accessToken = useLocalStorage('accessToken', '')
 const contactId = route.params.contactId
 const addressId = route.params.addressId
 
@@ -52,20 +51,19 @@ const fetchDetailContact = async () => {
   try {
     isFetchingContactData.value = true
 
-    const response = await contactRetrieveData(accessToken.value, contactId)
-    const responseBody = await response.json()
+    const response = await contactRetrieveData(contactId)
 
-    if (response.status !== 200) {
-      await alertError(responseBody.errors)
+    if (!response.status) {
+      await alertError(response.errors)
       return
     }
 
     Object.assign(contact, {
-      id: responseBody.data.id,
-      first_name: responseBody.data.first_name,
-      last_name: responseBody.data.last_name,
-      email: responseBody.data.email,
-      phone: responseBody.data.phone,
+      id: response.data.id,
+      first_name: response.data.first_name,
+      last_name: response.data.last_name,
+      email: response.data.email,
+      phone: response.data.phone,
     })
   } catch (error) {
     console.error(error.message)
@@ -88,22 +86,21 @@ const fetchDetailAddress = async () => {
   try {
     isFetchingAddressData.value = true
 
-    const response = await addressDetail(accessToken.value, contactId, addressId)
-    const responseBody = await response.json()
+    const response = await addressDetail(contactId, addressId)
 
-    if (response.status !== 200) {
-      await alertError(responseBody.errors)
+    if (!response.status) {
+      await alertError(response.errors)
       return
     }
 
     Object.assign(address, {
-      id: responseBody.data.id,
-      title: responseBody.data.title,
-      street: responseBody.data.street,
-      city: responseBody.data.city,
-      province: responseBody.data.province,
-      country: responseBody.data.country,
-      postal_code: responseBody.data.postal_code,
+      id: response.data.id,
+      title: response.data.title,
+      street: response.data.street,
+      city: response.data.city,
+      province: response.data.province,
+      country: response.data.country,
+      postal_code: response.data.postal_code,
     })
   } catch (error) {
     console.error(error.message)
@@ -121,11 +118,10 @@ const handleEditAddress = async () => {
   try {
     isLoading.value = true
 
-    const response = await addressEdit(accessToken.value, contactId, addressId, address)
-    const responseBody = await response.json()
+    const response = await addressEdit(contactId, addressId, address)
 
-    if (response.status !== 200) {
-      await alertError(responseBody.errors)
+    if (!response.status) {
+      await alertError(response.errors)
       return
     }
 
