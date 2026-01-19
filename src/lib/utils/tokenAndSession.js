@@ -23,6 +23,6 @@ export async function getRefreshToken() {
 }
 
 export function removeAllTokenFromCookies() {
-  cookies.remove('accessToken')
-  cookies.remove('refreshToken')
+  cookies.remove('accessToken', { path: '/' })
+  cookies.remove('refreshToken', { path: '/' })
 }

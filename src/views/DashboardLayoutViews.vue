@@ -10,20 +10,32 @@ const router = useRouter()
 const handleLogoutButton = async () => {
   await alertConfirm('You will be logout from the app!', 'Yes, Log me out').then(async (result) => {
     if (result.isConfirmed) {
-      const response = await userLogout()
+      try {
+        const response = await userLogout()
 
-      if (!response.status) {
-        await alertError(response.errors)
-        return
+        removeUserDataFromSessionStorage()
+        removeAllTokenFromCookies()
+
+        if (!response.status) {
+          await alertError(response.errors)
+          return
+        }
+
+        await alertSuccess('You will be directed to the Login Page')
+        await router.replace({
+          path: '/login',
+        })
+      } catch (error) {
+        console.error('Logout error:', error.message)
+
+        removeUserDataFromSessionStorage()
+        removeAllTokenFromCookies()
+        
+        await alertError('Failed to logout, clearing local session...')
+        await router.replace({
+          path: '/login',
+        })
       }
-
-      removeUserDataFromSessionStorage()
-      removeAllTokenFromCookies()
-
-      await alertSuccess('You will be directed to the Login Page')
-      router.replace({
-        path: '/login',
-      })
     }
   })
 }

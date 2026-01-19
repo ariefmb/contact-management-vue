@@ -94,24 +94,29 @@ const router = createRouter({
   ],
 })
 
-const GUEST_PAGES = ['/', '/login', '/register', '/guest/:path*']
+const AUTH_PAGES = ['/login', '/register']
 const PROTECTED_PREFIXES = ['/dashboard']
+const GUEST_PREFIXES = ['/', '/guest']
 
 router.beforeEach(async (to, from, next) => {
   const { path } = to
   const accessToken = (await getAccessToken()) ?? null
 
-  const isAuthPage = GUEST_PAGES.includes(path)
+  const isAuthPage = AUTH_PAGES.includes(path)
   const isProtectedRoute = PROTECTED_PREFIXES.some((prefix) => path.startsWith(prefix))
+  const isGuestPage = GUEST_PREFIXES.some(
+    (prefix) => path === prefix || path.startsWith(prefix + '/'),
+  )
 
   if (!accessToken) {
-    if (isAuthPage) return next()
+    if (isAuthPage || isGuestPage) return next()
     if (isProtectedRoute) return next('/login')
     return next()
   }
 
   if (accessToken) {
-    if (isAuthPage) return next('/dashboard')
+    if (isAuthPage || isGuestPage) return next('/dashboard')
+    if (isProtectedRoute) return next()
     return next()
   }
 })
