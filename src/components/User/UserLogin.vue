@@ -1,14 +1,13 @@
 <script setup>
-import { alertError, alertSuccess } from '@/lib/alert'
 import { userLogin } from '@/lib/api/UserApi'
-import { useLocalStorage } from '@vueuse/core'
+import { alertError, alertSuccess } from '@/lib/utils/alert'
+import { setUserDataInSessionStorage } from '@/lib/utils/sessionStorage'
+import { setAccessToken, setRefreshToken } from '@/lib/utils/tokenAndSession'
 import { reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
 const isLoading = ref(false)
-
 const router = useRouter()
-const accessToken = useLocalStorage('accessToken', '')
 
 const user = reactive({
   username: 'dubiidooo',
@@ -19,16 +18,18 @@ const handleSubmit = async () => {
   try {
     isLoading.value = true
     const response = await userLogin(user)
-    const responseBody = await response.json()
 
-    console.log(responseBody);
+    console.log(response)
 
-    if (response.status !== 200) {
-      await alertError(responseBody.errors)
+    if (!response.status) {
+      await alertError(response.errors)
       return
     }
 
-    accessToken.value = responseBody.data.accessToken
+    setUserDataInSessionStorage(response.data.user)
+    setAccessToken(response.data.accessToken)
+    setRefreshToken(response.data.refreshToken)
+
     await alertSuccess(`Welcome back, ${user.username}`)
 
     router.push({

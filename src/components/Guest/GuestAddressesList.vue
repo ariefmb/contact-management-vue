@@ -1,6 +1,6 @@
 <script setup>
-import { alertError } from '@/lib/alert'
 import { guestAddressesList } from '@/lib/api/GuestApi'
+import { alertError } from '@/lib/utils/alert'
 import { onBeforeMount, ref } from 'vue'
 import { useRoute } from 'vue-router'
 

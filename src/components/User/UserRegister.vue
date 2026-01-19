@@ -1,6 +1,6 @@
 <script setup>
-import { alertError, alertSuccess } from '@/lib/alert'
 import { userRegister } from '@/lib/api/UserApi'
+import { alertError, alertSuccess } from '@/lib/utils/alert'
 import { reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 

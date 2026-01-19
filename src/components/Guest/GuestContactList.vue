@@ -1,5 +1,5 @@
 <script setup>
-import { alertError } from '@/lib/alert'
+import { alertError } from '@/lib/utils/alert'
 import { guestContatsList } from '@/lib/api/GuestApi'
 import { useUrlSearchParams } from '@vueuse/core'
 import { onBeforeMount, reactive, ref, watch } from 'vue'

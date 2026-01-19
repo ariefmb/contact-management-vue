@@ -1,7 +1,7 @@
 <script setup>
-import { alertError, alertSuccess } from '@/lib/alert'
 import { addressDetail, addressEdit } from '@/lib/api/AddressApi'
 import { contactGet } from '@/lib/api/ContactApi'
+import { alertError, alertSuccess } from '@/lib/utils/alert'
 import { useLocalStorage } from '@vueuse/core'
 import { onBeforeMount, reactive, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'

@@ -1,6 +1,6 @@
 <script setup>
-import { alertError, alertSuccess } from '@/lib/alert'
 import { userGet, userUpdateName, userUpdatePassword } from '@/lib/api/UserApi'
+import { alertError, alertSuccess } from '@/lib/utils/alert'
 import { useLocalStorage } from '@vueuse/core'
 import { ref, watchEffect } from 'vue'
 

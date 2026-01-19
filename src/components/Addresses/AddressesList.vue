@@ -1,6 +1,6 @@
 <script setup>
-import { alertConfirm, alertError, alertSuccess } from '@/lib/alert'
 import { addressesList, addressRemove } from '@/lib/api/AddressApi'
+import { alertConfirm, alertError, alertSuccess } from '@/lib/utils/alert'
 import { useLocalStorage } from '@vueuse/core'
 import { onBeforeMount, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'

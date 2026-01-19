@@ -1,5 +1,5 @@
 <script setup>
-import { alertConfirm, alertError, alertSuccess } from '@/lib/alert'
+import { alertConfirm, alertError, alertSuccess } from '@/lib/utils/alert'
 import { contactGetList, contactRemove } from '@/lib/api/ContactApi'
 import { useLocalStorage, useUrlSearchParams } from '@vueuse/core'
 import { onBeforeMount, reactive, ref, watch } from 'vue'

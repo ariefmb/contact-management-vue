@@ -1,3 +1,5 @@
+import axiosInstance from '../utils/axios'
+
 export const userRegister = async ({ username, password, name }) => {
   return await fetch(`${import.meta.env.VITE_API_PATH}/api/users`, {
     method: 'POST',
@@ -14,17 +16,16 @@ export const userRegister = async ({ username, password, name }) => {
 }
 
 export const userLogin = async ({ username, password }) => {
-  return await fetch(`${import.meta.env.VITE_API_PATH}/api/users/login`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Accept: 'application/json',
-    },
-    body: JSON.stringify({
+  try {
+    const response = await axiosInstance.post('/api/users/login', {
       username,
       password,
-    }),
-  })
+    })
+    return response.data
+  } catch (error) {
+    if (error.response && error.response.data) return error.response.data
+    throw error
+  }
 }
 
 export const userRefreshToken = async ({ refreshToken }) => {

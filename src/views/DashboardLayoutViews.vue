@@ -1,6 +1,6 @@
 <script setup>
-import { alertConfirm, alertError, alertSuccess } from '@/lib/alert'
 import { userLogout } from '@/lib/api/UserApi'
+import { alertConfirm, alertError, alertSuccess } from '@/lib/utils/alert'
 import { useLocalStorage } from '@vueuse/core'
 import { useRouter } from 'vue-router'
 
