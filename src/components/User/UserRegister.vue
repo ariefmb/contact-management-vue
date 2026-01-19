@@ -23,10 +23,9 @@ const handleSubmit = async () => {
 
     isLoading.value = true
     const response = await userRegister(user)
-    const responseBody = await response.json()
 
-    if (response.status !== 200) {
-      await alertError(responseBody.errors)
+    if (!response.status) {
+      await alertError(response.errors)
       return
     }
 
