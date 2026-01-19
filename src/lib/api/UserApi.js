@@ -79,13 +79,12 @@ export const userUpdatePassword = async (accessToken, { password }) => {
   })
 }
 
-export const userLogout = async (accessToken) => {
-  return await fetch(`${import.meta.env.VITE_API_PATH}/api/users/logout`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Accept: 'application/json',
-      Authorization: accessToken,
-    },
-  })
+export const userLogout = async () => {
+  try {
+    const response = await axiosInstance.post('/api/users/logout')
+    return response.data
+  } catch (error) {
+    if (error.response && error.response.data) return error.response.data
+    throw error
+  }
 }

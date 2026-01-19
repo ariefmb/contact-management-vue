@@ -11,8 +11,11 @@ axiosInstance.interceptors.request.use(
   async (config) => {
     const token = await getAccessToken()
 
-    if (token?.value) {
-      config.headers.Authorization = `Bearer ${token.value}`
+
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`
+      console.log(`config: ${config}`);
+
     }
 
     return config

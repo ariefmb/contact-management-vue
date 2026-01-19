@@ -10,14 +10,14 @@ export function setRefreshToken(refreshToken) {
   cookies.set('refreshToken', refreshToken, { max: '15d' })
 }
 
-export function getAccessToken() {
-  const accessToken = cookies.get('accessToken')
+export async function getAccessToken() {
+  const accessToken = await cookies.get('accessToken')
 
   return accessToken ?? null
 }
 
-export function getRefreshToken() {
-  const refreshToken = cookies.get('refreshToken')
+export async function getRefreshToken() {
+  const refreshToken = await cookies.get('refreshToken')
 
   return refreshToken ?? null
 }

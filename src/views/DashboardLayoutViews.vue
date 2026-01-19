@@ -1,27 +1,29 @@
 <script setup>
 import { userLogout } from '@/lib/api/UserApi'
 import { alertConfirm, alertError, alertSuccess } from '@/lib/utils/alert'
-import { useLocalStorage } from '@vueuse/core'
+import { removeUserDataFromSessionStorage } from '@/lib/utils/sessionStorage'
+import { removeAllTokenFromCookies } from '@/lib/utils/tokenAndSession'
 import { useRouter } from 'vue-router'
 
-const accessToken = useLocalStorage('accessToken', '')
 const router = useRouter()
 
 const handleLogoutButton = async () => {
   await alertConfirm('You will be logout from the app!', 'Yes, Log me out').then(async (result) => {
     if (result.isConfirmed) {
-      const response = await userLogout(accessToken.value)
-      const responseBody = await response.json()
+      const response = await userLogout()
 
-      if (response.status === 200) {
-        await alertSuccess('You will be directed to the Login Page')
-        router.replace({
-          path: '/login',
-        })
-        accessToken.value = ''
-      } else {
-        await alertError(responseBody.errors)
+      if (!response.status) {
+        await alertError(response.errors)
+        return
       }
+
+      removeUserDataFromSessionStorage()
+      removeAllTokenFromCookies()
+
+      await alertSuccess('You will be directed to the Login Page')
+      router.replace({
+        path: '/login',
+      })
     }
   })
 }

@@ -19,8 +19,6 @@ const handleSubmit = async () => {
     isLoading.value = true
     const response = await userLogin(user)
 
-    console.log(response)
-
     if (!response.status) {
       await alertError(response.errors)
       return
