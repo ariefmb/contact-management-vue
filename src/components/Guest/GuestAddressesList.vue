@@ -1,5 +1,5 @@
 <script setup>
-import { guestAddressesList } from '@/lib/api/GuestApi'
+import { guestRetrieveAddressDatas } from '@/lib/api/GuestApi'
 import { alertError } from '@/lib/utils/alert'
 import { onBeforeMount, ref } from 'vue'
 import { useRoute } from 'vue-router'
@@ -25,15 +25,14 @@ const addresses = ref([])
 const fetchAddressesList = async () => {
   try {
     isLoading.value = true
-    const response = await guestAddressesList(contactId)
-    const responseBody = await response.json()
+    const response = await guestRetrieveAddressDatas(contactId)
 
-    if (response.status !== 200) {
-      await alertError(responseBody.errors)
+    if (!response.status) {
+      await alertError(response.errors)
       return
     }
 
-    addresses.value = responseBody.data
+    addresses.value = response.data
 
     setTimeout(() => {
       isLoading.value = false
@@ -99,20 +98,6 @@ onBeforeMount(async () => {
               <span class="mr-1">:</span>
               <span></span>
             </p>
-          </div>
-          <div class="flex justify-end space-x-3">
-            <button
-              disabled
-              class="px-4 py-2 bg-gradient text-white rounded-lg hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-800 transition-all duration-200 font-medium shadow-md flex items-center cursor-pointer"
-            >
-              <i class="fas fa-edit mr-2"></i> Edit
-            </button>
-            <button
-              disabled
-              class="px-4 py-2 bg-linear-to-r from-red-600 to-red-500 text-white rounded-lg hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-gray-800 transition-all duration-200 font-medium shadow-md flex items-center cursor-pointer"
-            >
-              <i class="fas fa-trash-alt mr-2"></i> Delete
-            </button>
           </div>
         </div>
       </template>

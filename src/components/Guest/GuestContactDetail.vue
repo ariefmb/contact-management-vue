@@ -1,5 +1,5 @@
 <script setup>
-import { guestContact } from '@/lib/api/GuestApi'
+import { guestRetrieveContactData } from '@/lib/api/GuestApi'
 import { alertError } from '@/lib/utils/alert'
 import { onBeforeMount, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
@@ -17,14 +17,14 @@ const contact = ref({
 })
 
 const fetchDetailContact = async () => {
-  const response = await guestContact(contactId)
-  const responseBody = await response.json()
+  const response = await guestRetrieveContactData(contactId)
 
-  if (response.status === 200) {
-    contact.value = responseBody.data
-  } else {
-    await alertError(responseBody.errors)
+  if (!response.status) {
+    await alertError(response.errors)
+    return
   }
+
+  contact.value = response.data
 }
 
 onBeforeMount(async () => {

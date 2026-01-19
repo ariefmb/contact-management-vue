@@ -1,6 +1,6 @@
 <script setup>
 import { alertError } from '@/lib/utils/alert'
-import { guestContatsList } from '@/lib/api/GuestApi'
+import { guestRetrieveAllContactDatas } from '@/lib/api/GuestApi'
 import { useUrlSearchParams } from '@vueuse/core'
 import { onBeforeMount, reactive, ref, watch } from 'vue'
 import { onMounted } from 'vue'
@@ -33,22 +33,20 @@ watch(totalPage, (value) => {
 
 const fetchContactsList = async () => {
   try {
-    const response = await guestContatsList({
+    const response = await guestRetrieveAllContactDatas({
       name: search.name,
       email: search.email,
       phone: search.phone,
       page: page.value,
     })
 
-    const responseBody = await response.json()
-
-    if (response.status !== 200) {
-      await alertError(responseBody.errors)
+    if (!response.status) {
+      await alertError(response.errors)
       return
     }
 
-    contacts.value = responseBody.data
-    totalPage.value = responseBody.paging.total_page
+    contacts.value = response.data
+    totalPage.value = response.paging.total_page
   } catch (error) {
     console.error(error.message)
   }
@@ -230,7 +228,7 @@ onMounted(() => {
   </div>
 
   <!-- Contact cards grid -->
-  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 min-h-96">
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
     <!-- Contact Card -->
     <template v-if="contacts.length !== 0">
       <div
