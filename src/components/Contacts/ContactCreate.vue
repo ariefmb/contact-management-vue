@@ -1,13 +1,11 @@
 <script setup>
 import { contactCreate } from '@/lib/api/ContactApi'
 import { alertError, alertSuccess } from '@/lib/utils/alert'
-import { useLocalStorage } from '@vueuse/core'
 import { reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
 const isLoading = ref(false)
 const router = useRouter()
-const accessToken = useLocalStorage('accessToken', '')
 
 const contact = reactive({
   first_name: '',
@@ -19,11 +17,11 @@ const contact = reactive({
 const handleCreateContact = async () => {
   try {
     isLoading.value = true
-    const response = await contactCreate(accessToken.value, contact)
-    const responseBody = await response.json()
 
-    if (response.status !== 200) {
-      await alertError(responseBody.errors)
+    const response = await contactCreate(contact)
+
+    if (!response.status) {
+      await alertError(response.errors)
       return
     }
 

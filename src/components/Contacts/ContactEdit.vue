@@ -1,7 +1,6 @@
 <script setup>
-import { contactGet, contactUpdate } from '@/lib/api/ContactApi'
+import { contactRetrieveData, contactUpdate } from '@/lib/api/ContactApi'
 import { alertError, alertSuccess } from '@/lib/utils/alert'
-import { useLocalStorage } from '@vueuse/core'
 import { onBeforeMount, reactive, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
@@ -9,8 +8,6 @@ const isLoading = ref(false)
 const isFetchingContactData = ref(false)
 const route = useRoute()
 const router = useRouter()
-
-const accessToken = useLocalStorage('accessToken', '')
 const contactId = route.params.contactId
 
 const contact = reactive({
@@ -25,20 +22,21 @@ const fetchDetailContact = async () => {
   try {
     isFetchingContactData.value = true
 
-    const response = await contactGet(accessToken.value, contactId)
-    const responseBody = await response.json()
+    const response = await contactRetrieveData(contactId)
 
-    if (response.status !== 200) {
-      await alertError(responseBody.errors)
+    if (!response.status) {
+      await alertError(response.errors)
       return
     }
 
+    console.log(response)
+
     Object.assign(contact, {
-      id: responseBody.data.id,
-      first_name: responseBody.data.first_name,
-      last_name: responseBody.data.last_name,
-      email: responseBody.data.email,
-      phone: responseBody.data.phone.replace('(+62) ', ''),
+      id: response.data.id,
+      first_name: response.data.first_name,
+      last_name: response.data.last_name,
+      email: response.data.email,
+      phone: response.data.phone.replace('(+62) ', ''),
     })
   } catch (error) {
     console.error(error.message)
@@ -54,12 +52,10 @@ onBeforeMount(async () => {
 const handleEditContact = async () => {
   try {
     isLoading.value = true
+    const response = await contactUpdate(contactId, contact)
 
-    const response = await contactUpdate(accessToken.value, contactId, contact)
-    const responseBody = await response.json()
-
-    if (response.status !== 200) {
-      await alertError(responseBody.errors)
+    if (!response.status) {
+      await alertError(response.errors)
       return
     }
 

@@ -1,6 +1,6 @@
 <script setup>
 import { addressAdd } from '@/lib/api/AddressApi'
-import { contactGet } from '@/lib/api/ContactApi'
+import { contactRetrieveData } from '@/lib/api/ContactApi'
 import { alertError, alertSuccess } from '@/lib/utils/alert'
 import { useLocalStorage } from '@vueuse/core'
 import { onBeforeMount, reactive, ref } from 'vue'
@@ -49,7 +49,7 @@ const fetchContactData = async () => {
   try {
     isFetchingContactData.value = true
 
-    const response = await contactGet(accessToken.value, contactId)
+    const response = await contactRetrieveData(accessToken.value, contactId)
     const responseBody = await response.json()
 
     if (response.status !== 200) {

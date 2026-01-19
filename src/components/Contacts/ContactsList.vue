@@ -1,7 +1,7 @@
 <script setup>
 import { alertConfirm, alertError, alertSuccess } from '@/lib/utils/alert'
-import { contactGetList, contactRemove } from '@/lib/api/ContactApi'
-import { useLocalStorage, useUrlSearchParams } from '@vueuse/core'
+import { contactRemove, contactRetrieveAllDatas } from '@/lib/api/ContactApi'
+import { useUrlSearchParams } from '@vueuse/core'
 import { onBeforeMount, reactive, ref, watch } from 'vue'
 import { onMounted } from 'vue'
 import { useRouter } from 'vue-router'
@@ -10,7 +10,6 @@ const isSearching = ref(false)
 const isLoading = ref(false)
 const searchParams = useUrlSearchParams()
 const router = useRouter()
-const accessToken = useLocalStorage('accessToken', '')
 
 const search = reactive({
   name: searchParams.name,
@@ -36,17 +35,16 @@ const handleDeleteContact = async (contactId) => {
   try {
     await alertConfirm('This contact will be remove!', 'Yes, remove it').then(async (result) => {
       if (result.isConfirmed) {
-        const response = await contactRemove(accessToken.value, contactId)
-        const responseBody = await response.json()
+        const response = await contactRemove(contactId)
 
-        if (response.status === 200) {
-          await alertSuccess('Successfully remove contact')
-          isLoading.value = true
-          await fetchContactsList()
-          isLoading.value = false
-        } else {
-          await alertError(responseBody.errors)
+        if (!response.status) {
+          await alertError(response.errors)
         }
+
+        await alertSuccess('Successfully remove contact')
+        isLoading.value = true
+        await fetchContactsList()
+        isLoading.value = false
       }
     })
   } catch (error) {
@@ -56,24 +54,20 @@ const handleDeleteContact = async (contactId) => {
 
 const fetchContactsList = async () => {
   try {
-    if (!accessToken.value) return
-
-    const response = await contactGetList(accessToken.value, {
+    const response = await contactRetrieveAllDatas({
       name: search.name,
       email: search.email,
       phone: search.phone,
       page: page.value,
     })
 
-    const responseBody = await response.json()
-
-    if (response.status !== 200) {
-      await alertError(responseBody.errors)
+    if (!response.status) {
+      await alertError(response.errors)
       return
     }
 
-    contacts.value = responseBody.data
-    totalPage.value = responseBody.paging.total_page
+    contacts.value = response.data
+    totalPage.value = response.paging.total_page
   } catch (error) {
     console.error(error.message)
   }

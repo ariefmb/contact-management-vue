@@ -1,5 +1,5 @@
 <script setup>
-import { contactGet } from '@/lib/api/ContactApi'
+import { contactRetrieveData } from '@/lib/api/ContactApi'
 import { alertError } from '@/lib/utils/alert'
 import { useLocalStorage } from '@vueuse/core'
 import { onBeforeMount, ref } from 'vue'
@@ -18,7 +18,7 @@ const contact = ref({
 })
 
 const fetchDetailContact = async () => {
-  const response = await contactGet(accessToken.value, contactId)
+  const response = await contactRetrieveData(accessToken.value, contactId)
   const responseBody = await response.json()
 
   if (response.status === 200) {

@@ -14,8 +14,6 @@ axiosInstance.interceptors.request.use(
 
     if (token) {
       config.headers.Authorization = `Bearer ${token}`
-      console.log(`config: ${config}`);
-
     }
 
     return config
@@ -75,7 +73,9 @@ async function createNewToken() {
       },
     )
 
-    const newToken = response.data.accessToken
+    const newToken = response.data.data.accessToken
+
+    console.log('new token:', newToken);
     setAccessToken(newToken)
     return newToken
   } catch (error) {
