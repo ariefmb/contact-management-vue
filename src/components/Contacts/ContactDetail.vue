@@ -1,12 +1,10 @@
 <script setup>
 import { contactRetrieveData } from '@/lib/api/ContactApi'
 import { alertError } from '@/lib/utils/alert'
-import { useLocalStorage } from '@vueuse/core'
 import { onBeforeMount, ref } from 'vue'
 import { useRoute } from 'vue-router'
 
 const route = useRoute()
-const accessToken = useLocalStorage('accessToken', '')
 const contactId = route.params.contactId
 
 const contact = ref({
@@ -18,14 +16,14 @@ const contact = ref({
 })
 
 const fetchDetailContact = async () => {
-  const response = await contactRetrieveData(accessToken.value, contactId)
-  const responseBody = await response.json()
+  const response = await contactRetrieveData(contactId)
 
-  if (response.status === 200) {
-    contact.value = responseBody.data
-  } else {
-    await alertError(responseBody.errors)
+  if (!response.status) {
+    await alertError(response.errors)
+    return
   }
+
+  contact.value = response.data
 }
 
 onBeforeMount(async () => {
