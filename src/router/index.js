@@ -11,6 +11,7 @@ import GuestContactList from '@/components/Guest/GuestContactList.vue'
 import UserLogin from '@/components/User/UserLogin.vue'
 import UserProfile from '@/components/User/UserProfile.vue'
 import UserRegister from '@/components/User/UserRegister.vue'
+import { getAccessToken } from '@/lib/utils/tokenAndSession'
 import DashboardLayoutViews from '@/views/DashboardLayoutViews.vue'
 import LayoutViews from '@/views/LayoutViews.vue'
 import { createRouter, createWebHistory } from 'vue-router'
@@ -91,6 +92,28 @@ const router = createRouter({
       ],
     },
   ],
+})
+
+const GUEST_PAGES = ['/', '/login', '/register', '/guest/:path*']
+const PROTECTED_PREFIXES = ['/dashboard']
+
+router.beforeEach(async (to, from, next) => {
+  const { path } = to
+  const accessToken = (await getAccessToken()) ?? null
+
+  const isAuthPage = GUEST_PAGES.includes(path)
+  const isProtectedRoute = PROTECTED_PREFIXES.some((prefix) => path.startsWith(prefix))
+
+  if (!accessToken) {
+    if (isAuthPage) return next()
+    if (isProtectedRoute) return next('/login')
+    return next()
+  }
+
+  if (accessToken) {
+    if (isAuthPage) return next('/dashboard')
+    return next()
+  }
 })
 
 export default router
