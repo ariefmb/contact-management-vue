@@ -8,6 +8,8 @@ import ContactsList from '@/components/Contacts/ContactsList.vue'
 import GuestAddressesList from '@/components/Guest/GuestAddressesList.vue'
 import GuestContactDetail from '@/components/Guest/GuestContactDetail.vue'
 import GuestContactList from '@/components/Guest/GuestContactList.vue'
+import ContactListSkeleton from '@/components/Skeleton/Contacts/ContactListSkeleton.vue'
+import GuestContactListSkeleton from '@/components/Skeleton/Guest/GuestContactListSkeleton.vue'
 import UserLogin from '@/components/User/UserLogin.vue'
 import UserProfile from '@/components/User/UserProfile.vue'
 import UserRegister from '@/components/User/UserRegister.vue'
@@ -26,6 +28,12 @@ const router = createRouter({
         {
           path: '',
           component: GuestContactList,
+          children: [
+            {
+              path: '',
+              component: GuestContactListSkeleton,
+            },
+          ],
         },
         {
           path: '/guest/contacts/:contactId',
@@ -58,10 +66,22 @@ const router = createRouter({
         {
           path: '',
           component: ContactsList,
+          children: [
+            {
+              path: '',
+              component: ContactListSkeleton,
+            },
+          ],
         },
         {
           path: 'contacts',
           component: ContactsList,
+          children: [
+            {
+              path: '',
+              component: ContactListSkeleton,
+            },
+          ],
         },
         {
           path: 'contacts/create',

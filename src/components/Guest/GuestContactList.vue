@@ -1,9 +1,8 @@
 <script setup>
-import { alertError } from '@/lib/utils/alert'
 import { guestRetrieveAllContactDatas } from '@/lib/api/GuestApi'
+import { alertError } from '@/lib/utils/alert'
 import { useUrlSearchParams } from '@vueuse/core'
-import { onBeforeMount, reactive, ref, watch } from 'vue'
-import { onMounted } from 'vue'
+import { onBeforeMount, onMounted, reactive, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 
 const isSearching = ref(false)
@@ -230,55 +229,64 @@ onMounted(() => {
   <!-- Contact cards grid -->
   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
     <!-- Contact Card -->
-    <template v-if="contacts.length !== 0">
-      <div
-        class="bg-gray-800 bg-opacity-80 rounded-xl shadow-custom border border-gray-700 overflow-hidden card-hover animate-fade-in"
-        v-for="contact in contacts"
-        :key="contact.id"
-      >
-        <div class="p-6">
-          <RouterLink
-            :to="`/guest/contacts/${contact.id}`"
-            class="block cursor-pointer hover:bg-gray-700 rounded-lg transition-all duration-200 p-3"
-          >
-            <div class="flex items-center mb-3">
-              <div
-                class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center mr-3 shadow-md"
-              >
-                <i class="fas fa-user text-white"></i>
+    <template v-if="isLoading">
+      <RouterView />
+    </template>
+
+    <template v-else>
+      <template v-if="contacts.length !== 0">
+        <div
+          class="bg-gray-800 bg-opacity-80 rounded-xl shadow-custom border border-gray-700 overflow-hidden card-hover animate-fade-in"
+          v-for="contact in contacts"
+          :key="contact.id"
+        >
+          <div class="p-6">
+            <RouterLink
+              :to="`/guest/contacts/${contact.id}`"
+              class="block cursor-pointer hover:bg-gray-700 rounded-lg transition-all duration-200 p-3"
+            >
+              <div class="flex items-center mb-3">
+                <div
+                  class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center mr-3 shadow-md"
+                >
+                  <i class="fas fa-user text-white"></i>
+                </div>
+                <h2
+                  class="text-xl font-semibold text-white hover:text-blue-300 transition-colors duration-200"
+                >
+                  {{ contact.first_name }} {{ contact.last_name }}
+                </h2>
               </div>
-              <h2
-                class="text-xl font-semibold text-white hover:text-blue-300 transition-colors duration-200"
-              >
-                {{ contact.first_name }} {{ contact.last_name }}
-              </h2>
-            </div>
-            <div class="space-y-3 text-gray-300 ml-2">
-              <p class="flex items-center">
-                <i class="fas fa-user-tag text-gray-500 w-6"></i>
-                <span class="font-medium w-24">First Name:</span>
-                <span>{{}}</span>
-                <span>{{ contact.first_name }}</span>
-              </p>
-              <p class="flex items-center">
-                <i class="fas fa-user-tag text-gray-500 w-6"></i>
-                <span class="font-medium w-24">Last Name:</span>
-                <span>{{ contact.last_name }}</span>
-              </p>
-              <p class="flex items-center">
-                <i class="fas fa-envelope text-gray-500 w-6"></i>
-                <span class="font-medium w-24">Email:</span>
-                <span>{{ contact.email }}</span>
-              </p>
-              <p class="flex items-center">
-                <i class="fas fa-phone text-gray-500 w-6"></i>
-                <span class="font-medium w-24">Phone:</span>
-                <span>{{ contact.phone }}</span>
-              </p>
-            </div>
-          </RouterLink>
+              <div class="space-y-3 text-gray-300 ml-2">
+                <p class="flex items-center gap-1.5">
+                  <i class="fas fa-user-tag text-gray-500 w-6"></i>
+                  <span class="font-medium w-24">First Name</span>
+                  <span>:</span>
+                  <span>{{ contact.first_name }}</span>
+                </p>
+                <p class="flex items-center gap-1.5">
+                  <i class="fas fa-user-tag text-gray-500 w-6"></i>
+                  <span class="font-medium w-24">Last Name</span>
+                  <span>:</span>
+                  <span>{{ contact.last_name }}</span>
+                </p>
+                <p class="flex items-center gap-1.5">
+                  <i class="fas fa-envelope text-gray-500 w-6"></i>
+                  <span class="font-medium w-24">Email</span>
+                  <span>:</span>
+                  <span>{{ contact.email }}</span>
+                </p>
+                <p class="flex items-center gap-1.5">
+                  <i class="fas fa-phone text-gray-500 w-6"></i>
+                  <span class="font-medium w-24">Phone</span>
+                  <span>:</span>
+                  <span>{{ contact.phone }}</span>
+                </p>
+              </div>
+            </RouterLink>
+          </div>
         </div>
-      </div>
+      </template>
     </template>
   </div>
 
