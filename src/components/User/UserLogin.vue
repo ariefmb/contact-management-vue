@@ -8,10 +8,10 @@ import { useRouter } from 'vue-router'
 const isLoading = ref(false)
 
 const router = useRouter()
-const token = useLocalStorage('token', '')
+const accessToken = useLocalStorage('accessToken', '')
 
 const user = reactive({
-  username: 'dubi',
+  username: 'dubiidooo',
   password: 'pw123',
 })
 
@@ -21,12 +21,14 @@ const handleSubmit = async () => {
     const response = await userLogin(user)
     const responseBody = await response.json()
 
+    console.log(responseBody);
+
     if (response.status !== 200) {
       await alertError(responseBody.errors)
       return
     }
 
-    token.value = responseBody.data.token
+    accessToken.value = responseBody.data.accessToken
     await alertSuccess(`Welcome back, ${user.username}`)
 
     router.push({

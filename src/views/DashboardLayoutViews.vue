@@ -4,13 +4,13 @@ import { userLogout } from '@/lib/api/UserApi'
 import { useLocalStorage } from '@vueuse/core'
 import { useRouter } from 'vue-router'
 
-const token = useLocalStorage('token', '')
+const accessToken = useLocalStorage('accessToken', '')
 const router = useRouter()
 
 const handleLogoutButton = async () => {
   await alertConfirm('You will be logout from the app!', 'Yes, Log me out').then(async (result) => {
     if (result.isConfirmed) {
-      const response = await userLogout(token.value)
+      const response = await userLogout(accessToken.value)
       const responseBody = await response.json()
 
       if (response.status === 200) {
@@ -18,7 +18,7 @@ const handleLogoutButton = async () => {
         router.replace({
           path: '/login',
         })
-        token.value = ''
+        accessToken.value = ''
       } else {
         await alertError(responseBody.errors)
       }

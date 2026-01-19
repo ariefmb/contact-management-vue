@@ -36,7 +36,7 @@ const isFetchingAddressData = ref(false)
 const router = useRouter()
 const route = useRoute()
 
-const token = useLocalStorage('token', '')
+const accessToken = useLocalStorage('accessToken', '')
 const contactId = route.params.contactId
 const addressId = route.params.addressId
 
@@ -52,7 +52,7 @@ const fetchDetailContact = async () => {
   try {
     isFetchingContactData.value = true
 
-    const response = await contactGet(token.value, contactId)
+    const response = await contactGet(accessToken.value, contactId)
     const responseBody = await response.json()
 
     if (response.status !== 200) {
@@ -88,7 +88,7 @@ const fetchDetailAddress = async () => {
   try {
     isFetchingAddressData.value = true
 
-    const response = await addressDetail(token.value, contactId, addressId)
+    const response = await addressDetail(accessToken.value, contactId, addressId)
     const responseBody = await response.json()
 
     if (response.status !== 200) {
@@ -121,7 +121,7 @@ const handleEditAddress = async () => {
   try {
     isLoading.value = true
 
-    const response = await addressEdit(token.value, contactId, addressId, address)
+    const response = await addressEdit(accessToken.value, contactId, addressId, address)
     const responseBody = await response.json()
 
     if (response.status !== 200) {

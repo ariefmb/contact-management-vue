@@ -1,5 +1,5 @@
 export const userRegister = async ({ username, password, name }) => {
-  return await fetch(`${import.meta.env.VITE_API_PATH}/users`, {
+  return await fetch(`${import.meta.env.VITE_API_PATH}/api/users`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -14,7 +14,7 @@ export const userRegister = async ({ username, password, name }) => {
 }
 
 export const userLogin = async ({ username, password }) => {
-  return await fetch(`${import.meta.env.VITE_API_PATH}/users/login`, {
+  return await fetch(`${import.meta.env.VITE_API_PATH}/api/users/login`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -27,24 +27,36 @@ export const userLogin = async ({ username, password }) => {
   })
 }
 
-export const userGet = async (token) => {
-  return await fetch(`${import.meta.env.VITE_API_PATH}/users/current`, {
+export const userRefreshToken = async ({ refreshToken }) => {
+  return await fetch(`${import.meta.env.VITE_API_PATH}/api/users/current/refresh`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      refreshToken,
+    }),
+  })
+}
+
+export const userGet = async (accessToken) => {
+  return await fetch(`${import.meta.env.VITE_API_PATH}/api/users/current`, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
       Accept: 'application/json',
-      Authorization: token,
+      Authorization: accessToken,
     },
   })
 }
 
-export const userUpdateName = async (token, { name }) => {
-  return await fetch(`${import.meta.env.VITE_API_PATH}/users/current`, {
+export const userUpdateName = async (accessToken, { name }) => {
+  return await fetch(`${import.meta.env.VITE_API_PATH}/api/users/current/update`, {
     method: 'PATCH',
     headers: {
       'Content-Type': 'application/json',
       Accept: 'application/json',
-      Authorization: token,
+      Authorization: accessToken,
     },
     body: JSON.stringify({
       name,
@@ -52,13 +64,13 @@ export const userUpdateName = async (token, { name }) => {
   })
 }
 
-export const userUpdatePassword = async (token, { password }) => {
-  return await fetch(`${import.meta.env.VITE_API_PATH}/users/current`, {
+export const userUpdatePassword = async (accessToken, { password }) => {
+  return await fetch(`${import.meta.env.VITE_API_PATH}/api/users/current/update`, {
     method: 'PATCH',
     headers: {
       'Content-Type': 'application/json',
       Accept: 'application/json',
-      Authorization: token,
+      Authorization: accessToken,
     },
     body: JSON.stringify({
       password,
@@ -66,13 +78,13 @@ export const userUpdatePassword = async (token, { password }) => {
   })
 }
 
-export const userLogout = async (token) => {
-  return await fetch(`${import.meta.env.VITE_API_PATH}/users/current`, {
-    method: 'DELETE',
+export const userLogout = async (accessToken) => {
+  return await fetch(`${import.meta.env.VITE_API_PATH}/api/users/logout`, {
+    method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       Accept: 'application/json',
-      Authorization: token,
+      Authorization: accessToken,
     },
   })
 }

@@ -6,7 +6,7 @@ import { onBeforeMount, ref } from 'vue'
 import { useRoute } from 'vue-router'
 
 const route = useRoute()
-const token = useLocalStorage('token', '')
+const accessToken = useLocalStorage('accessToken', '')
 const contactId = route.params.contactId
 
 const contact = ref({
@@ -18,7 +18,7 @@ const contact = ref({
 })
 
 const fetchDetailContact = async () => {
-  const response = await contactGet(token.value, contactId)
+  const response = await contactGet(accessToken.value, contactId)
   const responseBody = await response.json()
 
   if (response.status === 200) {

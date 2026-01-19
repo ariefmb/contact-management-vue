@@ -10,7 +10,7 @@ const isFetchingContactData = ref(false)
 const route = useRoute()
 const router = useRouter()
 
-const token = useLocalStorage('token', '')
+const accessToken = useLocalStorage('accessToken', '')
 const contactId = route.params.contactId
 
 const contact = reactive({
@@ -25,7 +25,7 @@ const fetchDetailContact = async () => {
   try {
     isFetchingContactData.value = true
 
-    const response = await contactGet(token.value, contactId)
+    const response = await contactGet(accessToken.value, contactId)
     const responseBody = await response.json()
 
     if (response.status !== 200) {
@@ -55,7 +55,7 @@ const handleEditContact = async () => {
   try {
     isLoading.value = true
 
-    const response = await contactUpdate(token.value, contactId, contact)
+    const response = await contactUpdate(accessToken.value, contactId, contact)
     const responseBody = await response.json()
 
     if (response.status !== 200) {

@@ -35,7 +35,7 @@ const isFetchingContactData = ref(false)
 const route = useRoute()
 const router = useRouter()
 
-const token = useLocalStorage('token', '')
+const accessToken = useLocalStorage('accessToken', '')
 const contactId = route.params.contactId
 
 const contact = reactive({
@@ -49,7 +49,7 @@ const fetchContactData = async () => {
   try {
     isFetchingContactData.value = true
 
-    const response = await contactGet(token.value, contactId)
+    const response = await contactGet(accessToken.value, contactId)
     const responseBody = await response.json()
 
     if (response.status !== 200) {
@@ -87,7 +87,7 @@ const handleAddAddress = async () => {
   try {
     isLoading.value = true
 
-    const response = await addressAdd(token.value, contactId, address)
+    const response = await addressAdd(accessToken.value, contactId, address)
     const responseBody = await response.json()
 
     if (response.status !== 200) {

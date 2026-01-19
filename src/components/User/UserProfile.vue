@@ -4,16 +4,16 @@ import { userGet, userUpdateName, userUpdatePassword } from '@/lib/api/UserApi'
 import { useLocalStorage } from '@vueuse/core'
 import { ref, watchEffect } from 'vue'
 
-const token = useLocalStorage('token', '')
+const accessToken = useLocalStorage('accessToken', '')
 
 const name = ref('')
 const password = ref('')
 const confirmPassword = ref('')
 
 watchEffect(async () => {
-  if (!token.value) return
-  
-  const response = await userGet(token.value)
+  if (!accessToken.value) return
+
+  const response = await userGet(accessToken.value)
   const responseBody = await response.json()
 
   if (response.status === 200) {
@@ -24,7 +24,7 @@ watchEffect(async () => {
 })
 
 const handleUpdateName = async () => {
-  const response = await userUpdateName(token.value, { name: name.value })
+  const response = await userUpdateName(accessToken.value, { name: name.value })
   const responseBody = await response.json()
 
   if (response.status === 200) {
@@ -40,7 +40,7 @@ const handleUpdatePassword = async () => {
     return
   }
 
-  const response = await userUpdatePassword(token.value, { password: password.value })
+  const response = await userUpdatePassword(accessToken.value, { password: password.value })
   const responseBody = await response.json()
 
   if (response.status === 200) {

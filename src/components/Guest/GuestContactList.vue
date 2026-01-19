@@ -19,7 +19,7 @@ const search = reactive({
 
 const page = ref(1)
 const totalPage = ref(1)
-const pages = ref([])
+const pages = ref([1])
 
 const contacts = ref([])
 

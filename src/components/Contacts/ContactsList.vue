@@ -10,7 +10,7 @@ const isSearching = ref(false)
 const isLoading = ref(false)
 const searchParams = useUrlSearchParams()
 const router = useRouter()
-const token = useLocalStorage('token', '')
+const accessToken = useLocalStorage('accessToken', '')
 
 const search = reactive({
   name: searchParams.name,
@@ -20,7 +20,7 @@ const search = reactive({
 
 const page = ref(1)
 const totalPage = ref(1)
-const pages = ref([])
+const pages = ref([1])
 
 const contacts = ref([])
 
@@ -36,7 +36,7 @@ const handleDeleteContact = async (contactId) => {
   try {
     await alertConfirm('This contact will be remove!', 'Yes, remove it').then(async (result) => {
       if (result.isConfirmed) {
-        const response = await contactRemove(token.value, contactId)
+        const response = await contactRemove(accessToken.value, contactId)
         const responseBody = await response.json()
 
         if (response.status === 200) {
@@ -56,9 +56,9 @@ const handleDeleteContact = async (contactId) => {
 
 const fetchContactsList = async () => {
   try {
-    if (!token.value) return
+    if (!accessToken.value) return
 
-    const response = await contactGetList(token.value, {
+    const response = await contactGetList(accessToken.value, {
       name: search.name,
       email: search.email,
       phone: search.phone,

@@ -23,7 +23,7 @@ const isLoading = ref(false)
 const route = useRoute()
 const router = useRouter()
 
-const token = useLocalStorage('token', '')
+const accessToken = useLocalStorage('accessToken', '')
 const contactId = route.params.contactId
 
 const addresses = ref([])
@@ -31,7 +31,7 @@ const addresses = ref([])
 const handleRemoveAddress = async (addressId) => {
   await alertConfirm('This address will be remove!', 'Yes, remove it').then(async (result) => {
     if (result.isConfirmed) {
-      const response = await addressRemove(token.value, contactId, addressId)
+      const response = await addressRemove(accessToken.value, contactId, addressId)
       const responseBody = await response.json()
 
       if (response.status === 200) {
@@ -46,10 +46,10 @@ const handleRemoveAddress = async (addressId) => {
 
 const fetchAddressesList = async () => {
   try {
-    if (!token.value) return
+    if (!accessToken.value) return
 
     isLoading.value = true
-    const response = await addressesList(token.value, contactId)
+    const response = await addressesList(accessToken.value, contactId)
     const responseBody = await response.json()
 
     if (response.status !== 200) {
