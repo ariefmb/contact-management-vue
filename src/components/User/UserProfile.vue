@@ -1,55 +1,69 @@
 <script setup>
-import { userGet, userUpdateName, userUpdatePassword } from '@/lib/api/UserApi'
+import { userRetrieveData, userUpdateName, userUpdatePassword } from '@/lib/api/UserApi'
 import { alertError, alertSuccess } from '@/lib/utils/alert'
-import { useLocalStorage } from '@vueuse/core'
 import { ref, watchEffect } from 'vue'
-
-const accessToken = useLocalStorage('accessToken', '')
 
 const name = ref('')
 const password = ref('')
 const confirmPassword = ref('')
 
+const isUpdatingName = ref(false)
+const isUpdatingPass = ref(false)
+
 watchEffect(async () => {
-  if (!accessToken.value) return
+  const response = await userRetrieveData()
 
-  const response = await userGet(accessToken.value)
-  const responseBody = await response.json()
-
-  if (response.status === 200) {
-    name.value = responseBody.data.name
-  } else {
-    await alertError(responseBody.errors)
+  if (!response.status) {
+    await alertError(response.errors)
+    return
   }
+
+  name.value = response.data.name
 })
 
 const handleUpdateName = async () => {
-  const response = await userUpdateName(accessToken.value, { name: name.value })
-  const responseBody = await response.json()
+  try {
+    isUpdatingName.value = true
 
-  if (response.status === 200) {
+    const response = await userUpdateName({ name: name.value })
+
+    if (!response.status) {
+      await alertError(response.erros)
+      return
+    }
+
     await alertSuccess('Update Name Successfully')
-  } else {
-    await alertError(responseBody.erros)
+  } catch (error) {
+    console.error(error.message)
+  } finally {
+    isUpdatingName.value = false
   }
 }
 
 const handleUpdatePassword = async () => {
-  if (password.value !== confirmPassword.value) {
-    await alertError('Password does not match')
-    return
-  }
+  try {
+    if (password.value !== confirmPassword.value) {
+      await alertError('Password does not match')
+      return
+    }
 
-  const response = await userUpdatePassword(accessToken.value, { password: password.value })
-  const responseBody = await response.json()
+    isUpdatingPass.value = true
 
-  if (response.status === 200) {
+    const response = await userUpdatePassword({ password: password.value })
+
+    if (!response.status) {
+      await alertError(response.erros)
+      return
+    }
+
     password.value = ''
     confirmPassword.value = ''
 
     await alertSuccess('Update Password Successfully')
-  } else {
-    await alertError(responseBody.erros)
+  } catch (error) {
+    console.error(error.message)
+  } finally {
+    isUpdatingPass.value = false
   }
 }
 </script>
@@ -97,8 +111,32 @@ const handleUpdatePassword = async () => {
             <button
               type="submit"
               class="w-full bg-gradient text-white py-3 px-4 rounded-lg hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-800 transition-all duration-200 font-medium shadow-lg transform hover:-translate-y-0.5 flex items-center justify-center cursor-pointer"
+              :disabled="isUpdatingName"
             >
-              <i class="fas fa-save mr-2"></i> Update Profile
+              <span v-if="isUpdatingName" class="flex items-center justify-center">
+                <svg
+                  class="mr-3 size-5 animate-spin text-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    class="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    stroke-width="4"
+                  ></circle>
+                  <path
+                    class="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  ></path>
+                </svg>
+                Updating Profile...
+              </span>
+              <span v-else> <i class="fas fa-save mr-2"></i> Update Profile </span>
             </button>
           </div>
         </form>
@@ -163,8 +201,32 @@ const handleUpdatePassword = async () => {
             <button
               type="submit"
               class="w-full bg-gradient text-white py-3 px-4 rounded-lg hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-800 transition-all duration-200 font-medium shadow-lg transform hover:-translate-y-0.5 flex items-center justify-center cursor-pointer"
+              :disabled="isUpdatingPass"
             >
-              <i class="fas fa-key mr-2"></i> Update Password
+              <span v-if="isUpdatingPass" class="flex items-center justify-center">
+                <svg
+                  class="mr-3 size-5 animate-spin text-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    class="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    stroke-width="4"
+                  ></circle>
+                  <path
+                    class="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  ></path>
+                </svg>
+                Updating Password...
+              </span>
+              <span v-else> <i class="fas fa-key mr-2"></i> Update Password </span>
             </button>
           </div>
         </form>

@@ -28,60 +28,47 @@ export const userLogin = async ({ username, password }) => {
   }
 }
 
-export const userRefreshToken = async ({ refreshToken }) => {
-  return await fetch(`${import.meta.env.VITE_API_PATH}/api/users/current/refresh`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      refreshToken,
-    }),
-  })
+export const userRetrieveData = async () => {
+  try {
+    const response = await axiosInstance.get('/api/users/current')
+
+    return response.data
+  } catch (error) {
+    if (error.response && error.response.data) return error.response.data
+    throw error
+  }
 }
 
-export const userGet = async (accessToken) => {
-  return await fetch(`${import.meta.env.VITE_API_PATH}/api/users/current`, {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-      Accept: 'application/json',
-      Authorization: accessToken,
-    },
-  })
-}
-
-export const userUpdateName = async (accessToken, { name }) => {
-  return await fetch(`${import.meta.env.VITE_API_PATH}/api/users/current/update`, {
-    method: 'PATCH',
-    headers: {
-      'Content-Type': 'application/json',
-      Accept: 'application/json',
-      Authorization: accessToken,
-    },
-    body: JSON.stringify({
+export const userUpdateName = async ({ name }) => {
+  try {
+    const response = await axiosInstance.patch('/api/users/current/update', {
       name,
-    }),
-  })
+    })
+
+    return response.data
+  } catch (error) {
+    if (error.response && error.response.data) return error.response.data
+    throw error
+  }
 }
 
-export const userUpdatePassword = async (accessToken, { password }) => {
-  return await fetch(`${import.meta.env.VITE_API_PATH}/api/users/current/update`, {
-    method: 'PATCH',
-    headers: {
-      'Content-Type': 'application/json',
-      Accept: 'application/json',
-      Authorization: accessToken,
-    },
-    body: JSON.stringify({
+export const userUpdatePassword = async ({ password }) => {
+  try {
+    const response = await axiosInstance.patch('/api/users/current/update', {
       password,
-    }),
-  })
+    })
+
+    return response.data
+  } catch (error) {
+    if (error.response && error.response.data) return error.response.data
+    throw error
+  }
 }
 
 export const userLogout = async () => {
   try {
     const response = await axiosInstance.post('/api/users/logout')
+    
     return response.data
   } catch (error) {
     if (error.response && error.response.data) return error.response.data
