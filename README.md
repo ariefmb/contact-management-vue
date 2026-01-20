@@ -1,4 +1,4 @@
-<div align="center" >
+<div align="center" style="border-radius: 20px 20px 0 0;" >
   <img src="public/img/banner.png" alt="Banner" style="max-width: 100%; border-radius: 20px 20px 0 0" />
 </div>
 
@@ -13,12 +13,13 @@ A Vue 3 single-page application demonstrating modern frontend architecture with 
 
 **Live Features:** Public contact directory, user registration/login with token refresh, protected dashboard with contact/address management, profile updates, and optimized lazy-loaded routes.
 <br/>
+
 <div align="center">
 
 [![Live Demo](https://img.shields.io/badge/🚀_Live_Demo-Visit_App-00C7B7?style=for-the-badge&logoColor=white)](https://contact-management-ariefmb.vercel.app/)
+
 </div>
 
----
 
 ## 📋 About This Project
 
@@ -31,7 +32,6 @@ This is a **personal learning and portfolio project** built to demonstrate:
 
 **Note:** This is a frontend-only project consuming a REST API. It focuses on client-side engineering and does not include backend implementation.
 
----
 
 ## 🎯 Key Engineering Highlights
 
@@ -53,7 +53,6 @@ This is a **personal learning and portfolio project** built to demonstrate:
 - **Nested routes** for hierarchical data
 - **Reusable** service layer and components
 
----
 
 ## ✨ Features
 
@@ -63,7 +62,6 @@ This is a **personal learning and portfolio project** built to demonstrate:
 - 👤 **Profile Management:** Update display name and password
 - 🎨 **Modern UX:** Gradient UI, loading states, collapsible search, animated skeletons
 
----
 
 ## 🛠️ Tech Stack
 
@@ -88,7 +86,6 @@ This is a **personal learning and portfolio project** built to demonstrate:
 
 - [![ESLint](https://img.shields.io/badge/ESLint-9-4B3FBF?style=flat&logo=eslint)](https://eslint.org/) [![Prettier](https://img.shields.io/badge/Prettier-3-F7B93E?style=flat&logo=prettier)](https://prettier.io/) Code quality and consistent formatting
 
----
 
 ## 🗺️ Application Architecture
 
@@ -108,7 +105,6 @@ This is a **personal learning and portfolio project** built to demonstrate:
 
 **Guards:** Check token → redirect guests to `/login`, authed users to `/dashboard`
 
----
 
 ## 🔑 API Integration & Authentication
 
@@ -126,7 +122,6 @@ This is a **personal learning and portfolio project** built to demonstrate:
 
 **Services:** Modular API layer in `src/lib/api/`
 
----
 
 ## ▶️ Getting Started
 
@@ -162,7 +157,6 @@ npm run preview
 **Environment Setup**
 Create `.env` in project root
 
----
 
 ## 🎨 UX & Design Decisions
 
@@ -190,7 +184,6 @@ Create `.env` in project root
 - Page size optimization: guest (6), dashboard (5) items per page
 - Loading overlay on pagination to prevent interaction during fetch
 
----
 
 ## 📚 Skills Demonstrated
 
@@ -202,7 +195,6 @@ This project showcases practical frontend engineering skills including:
 ✅ **Build** – Rollup chunks, tree-shaking, env config
 ✅ **API** – Axios interceptors, service layer, token refresh
 
----
 
 ## ⚠️ Known Limitations
 
@@ -214,7 +206,6 @@ As a learning/portfolio project, there are deliberate trade-offs:
 - **Error Handling:** Modal alerts block user interaction. Toast notifications or error boundaries would improve UX.
 - **Offline Support:** No service worker or cache strategy. Data refetched on every navigation.
 
----
 
 ## 🖼️ Screenshots
 
@@ -236,7 +227,6 @@ User profile update form with password change.
 
 ![Profile](public/img/profile.png)
 
----
 
 ## 🚀 Future Improvements
 
@@ -250,7 +240,6 @@ Potential enhancements if continuing this project:
 - Theme toggle
 - Service worker
 
----
 
 ## 📝 License
 
