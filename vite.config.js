@@ -12,13 +12,8 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: {
-          // Layout components
           layout: ['./src/views/LayoutViews.vue', './src/views/DashboardLayoutViews.vue'],
-
-          // Authentication pages
           auth: ['./src/components/User/UserLogin.vue', './src/components/User/UserRegister.vue'],
-
-          // Guest-facing features (public access)
           guest: [
             './src/components/Guest/GuestContactList.vue',
             './src/components/Guest/GuestContactDetail.vue',
@@ -26,8 +21,6 @@ export default defineConfig({
             './src/components/Skeleton/Guest/GuestContactListSkeleton.vue',
             './src/components/Skeleton/Guest/GuestAddressesListSkeleton.vue',
           ],
-
-          // Contact management (authenticated)
           contacts: [
             './src/components/Contacts/ContactsList.vue',
             './src/components/Contacts/ContactCreate.vue',
@@ -35,16 +28,12 @@ export default defineConfig({
             './src/components/Contacts/ContactEdit.vue',
             './src/components/Skeleton/Contacts/ContactListSkeleton.vue',
           ],
-
-          // Address management (authenticated)
           addresses: [
             './src/components/Addresses/AddressesList.vue',
             './src/components/Addresses/AddressAdd.vue',
             './src/components/Addresses/AddressEdit.vue',
             './src/components/Skeleton/Addresses/AddressesListSkeleton.vue',
           ],
-
-          // User profile
           user: ['./src/components/User/UserProfile.vue'],
         },
       },
