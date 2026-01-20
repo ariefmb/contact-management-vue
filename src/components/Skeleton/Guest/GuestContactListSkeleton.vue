@@ -14,32 +14,32 @@
           >
             <i class="fas fa-user text-white"></i>
           </div>
-          <div class="block w-[85%] h-8 antialiased bg-gray-300 rounded-full"></div>
+          <div class="block w-[85%] h-8 antialiased bg-gray-500 rounded-full"></div>
         </div>
         <div class="space-y-3 text-gray-300 ml-2">
           <p class="flex items-center gap-1.5">
             <i class="fas fa-user-tag text-gray-500 w-6"></i>
             <span class="font-medium w-24">First Name</span>
             <span>:</span>
-            <span class="block w-[62%] h-5 antialiased bg-gray-300 rounded-full"></span>
+            <span class="block w-[62%] h-5 antialiased bg-gray-500 rounded-full"></span>
           </p>
           <p class="flex items-center gap-1.5">
             <i class="fas fa-user-tag text-gray-500 w-6"></i>
             <span class="font-medium w-24">Last Name</span>
             <span>:</span>
-            <span class="block w-[62%] h-5 antialiased bg-gray-300 rounded-full"></span>
+            <span class="block w-[62%] h-5 antialiased bg-gray-500 rounded-full"></span>
           </p>
           <p class="flex items-center gap-1.5">
             <i class="fas fa-envelope text-gray-500 w-6"></i>
             <span class="font-medium w-24">Email</span>
             <span>:</span>
-            <span class="block w-[62%] h-5 antialiased bg-gray-300 rounded-full"></span>
+            <span class="block w-[62%] h-5 antialiased bg-gray-500 rounded-full"></span>
           </p>
           <p class="flex items-center gap-1.5">
             <i class="fas fa-phone text-gray-500 w-6"></i>
             <span class="font-medium w-24">Phone</span>
             <span>:</span>
-            <span class="block w-[62%] h-5 antialiased bg-gray-300 rounded-full"></span>
+            <span class="block w-[62%] h-5 antialiased bg-gray-500 rounded-full"></span>
           </p>
         </div>
       </div>

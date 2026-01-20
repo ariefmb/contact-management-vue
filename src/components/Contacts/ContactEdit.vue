@@ -73,7 +73,7 @@ const handleEditContact = async () => {
   <div class="flex items-center mb-6">
     <button
       @click="router.back()"
-      class="text-blue-400 hover:text-blue-300 mr-4 flex items-center transition-colors duration-200"
+      class="text-blue-400 hover:text-blue-300 mr-4 flex items-center transition-colors duration-200 cursor-pointer"
     >
       <i class="fas fa-arrow-left mr-2"></i> Back to Contacts
     </button>
