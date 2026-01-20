@@ -12,25 +12,40 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: {
-          views: ['./src/views/DashboardLayoutViews.vue'],
-          users: ['./src/components/User/UserProfile.vue'],
-          'group-contacts': [
+          // Layout components
+          layout: ['./src/views/LayoutViews.vue', './src/views/DashboardLayoutViews.vue'],
+
+          // Authentication pages
+          auth: ['./src/components/User/UserLogin.vue', './src/components/User/UserRegister.vue'],
+
+          // Guest-facing features (public access)
+          guest: [
+            './src/components/Guest/GuestContactList.vue',
+            './src/components/Guest/GuestContactDetail.vue',
+            './src/components/Guest/GuestAddressesList.vue',
+            './src/components/Skeleton/Guest/GuestContactListSkeleton.vue',
+            './src/components/Skeleton/Guest/GuestAddressesListSkeleton.vue',
+          ],
+
+          // Contact management (authenticated)
+          contacts: [
             './src/components/Contacts/ContactsList.vue',
             './src/components/Contacts/ContactCreate.vue',
             './src/components/Contacts/ContactDetail.vue',
             './src/components/Contacts/ContactEdit.vue',
+            './src/components/Skeleton/Contacts/ContactListSkeleton.vue',
           ],
-          'group-addresses': [
+
+          // Address management (authenticated)
+          addresses: [
             './src/components/Addresses/AddressesList.vue',
             './src/components/Addresses/AddressAdd.vue',
             './src/components/Addresses/AddressEdit.vue',
-          ],
-          'group-skeletons': [
-            './src/components/Skeleton/Contacts/ContactListSkeleton.vue',
             './src/components/Skeleton/Addresses/AddressesListSkeleton.vue',
-            './src/components/Skeleton/Guest/GuestContactListSkeleton.vue',
-            './src/components/Skeleton/Guest/GuestAddressesListSkeleton.vue',
           ],
+
+          // User profile
+          user: ['./src/components/User/UserProfile.vue'],
         },
       },
     },
