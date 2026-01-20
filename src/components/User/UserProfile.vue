@@ -7,18 +7,26 @@ const name = ref('')
 const password = ref('')
 const confirmPassword = ref('')
 
+const isFetching = ref(false)
 const isUpdatingName = ref(false)
 const isUpdatingPass = ref(false)
 
 watchEffect(async () => {
-  const response = await userRetrieveData()
+  isFetching.value = true
+  try {
+    const response = await userRetrieveData()
 
-  if (!response.status) {
-    await alertError(response.errors)
-    return
+    if (!response.status) {
+      await alertError(response.errors)
+      return
+    }
+
+    name.value = response.data.name
+  } catch (error) {
+    console.error(error)
+  } finally {
+    isFetching.value = false
   }
-
-  name.value = response.data.name
 })
 
 const handleUpdateName = async () => {
@@ -99,7 +107,7 @@ const handleUpdatePassword = async () => {
                 type="text"
                 id="name"
                 name="name"
-                class="w-full pl-10 pr-3 py-3 bg-gray-700 bg-opacity-50 border border-gray-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+                :class="[isFetching ? 'opacity-50 cursor-not-allowed' : 'opacity-100', 'w-full pl-10 pr-3 py-3 bg-gray-700 bg-opacity-50 border border-gray-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200']"
                 placeholder="Enter your full name"
                 required
                 v-model="name"

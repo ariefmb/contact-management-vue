@@ -48,8 +48,8 @@ onBeforeMount(async () => {
 })
 
 const handleEditContact = async () => {
+  isLoading.value = true
   try {
-    isLoading.value = true
     const response = await contactUpdate(contactId, contact)
 
     if (!response.status) {
@@ -100,9 +100,13 @@ const handleEditContact = async () => {
                 type="text"
                 id="first_name"
                 name="first_name"
-                class="w-full pl-10 pr-3 py-3 bg-gray-700 bg-opacity-50 border border-gray-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+                :class="[
+                  isFetchingContactData ? 'opacity-50 cursor-not-allowed' : 'opacity-100',
+                  'w-full pl-10 pr-3 py-3 bg-gray-700 bg-opacity-50 border border-gray-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200',
+                ]"
                 placeholder="Enter first name"
                 required
+                :disabled="isFetchingContactData"
                 v-model="contact.first_name"
               />
             </div>
@@ -119,9 +123,13 @@ const handleEditContact = async () => {
                 type="text"
                 id="last_name"
                 name="last_name"
-                class="w-full pl-10 pr-3 py-3 bg-gray-700 bg-opacity-50 border border-gray-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+                :class="[
+                  isFetchingContactData ? 'opacity-50 cursor-not-allowed' : 'opacity-100',
+                  'w-full pl-10 pr-3 py-3 bg-gray-700 bg-opacity-50 border border-gray-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200',
+                ]"
                 placeholder="Enter last name"
                 required
+                :disabled="isFetchingContactData"
                 v-model="contact.last_name"
               />
             </div>
@@ -138,9 +146,13 @@ const handleEditContact = async () => {
               type="email"
               id="email"
               name="email"
-              class="w-full pl-10 pr-3 py-3 bg-gray-700 bg-opacity-50 border border-gray-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+              :class="[
+                isFetchingContactData ? 'opacity-50 cursor-not-allowed' : 'opacity-100',
+                'w-full pl-10 pr-3 py-3 bg-gray-700 bg-opacity-50 border border-gray-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200',
+              ]"
               placeholder="Enter email address"
               required
+              :disabled="isFetchingContactData"
               v-model="contact.email"
             />
           </div>
@@ -157,9 +169,13 @@ const handleEditContact = async () => {
               type="tel"
               id="phone"
               name="phone"
-              class="w-full pl-20 pr-3 py-3 bg-gray-700 bg-opacity-50 border border-gray-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+              :class="[
+                isFetchingContactData ? 'opacity-50 cursor-not-allowed' : 'opacity-100',
+                'w-full pl-20 pr-3 py-3 bg-gray-700 bg-opacity-50 border border-gray-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200',
+              ]"
               placeholder="Enter phone number"
               required
+              :disabled="isFetchingContactData"
               v-model="contact.phone"
             />
           </div>

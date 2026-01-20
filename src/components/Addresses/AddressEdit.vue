@@ -48,9 +48,8 @@ const contact = reactive({
 })
 
 const fetchDetailContact = async () => {
+  isFetchingContactData.value = true
   try {
-    isFetchingContactData.value = true
-
     const response = await contactRetrieveData(contactId)
 
     if (!response.status) {
@@ -83,9 +82,8 @@ const address = reactive({
 })
 
 const fetchDetailAddress = async () => {
+  isFetchingAddressData.value = true
   try {
-    isFetchingAddressData.value = true
-
     const response = await addressDetail(contactId, addressId)
 
     if (!response.status) {
@@ -115,9 +113,8 @@ onBeforeMount(async () => {
 })
 
 const handleEditAddress = async () => {
+  isLoading.value = true
   try {
-    isLoading.value = true
-
     const response = await addressEdit(contactId, addressId, address)
 
     if (!response.status) {
@@ -162,12 +159,24 @@ const handleEditAddress = async () => {
           >
             <i class="fas fa-user text-white"></i>
           </div>
-          <div>
-            <h2 class="text-xl font-semibold text-white">
-              {{ contact.first_name }} {{ contact.last_name }}
-            </h2>
-            <p class="text-gray-300 text-sm">{{ contact.email }} • {{ contact.phone }}</p>
-          </div>
+          <template v-if="isFetchingContactData">
+            <div class="animate-pulse w-fit flex flex-col items-start gap-1">
+              <div class="w-full h-5 antialiased bg-gray-500 rounded-full"></div>
+              <div class="flex items-center text-gray-300 gap-2">
+                <span class="w-20 h-4 antialiased bg-gray-500 rounded-full"></span>
+                <span> • </span>
+                <span class="w-24 h-4 antialiased bg-gray-500 rounded-full"></span>
+              </div>
+            </div>
+          </template>
+          <template v-else>
+            <div>
+              <h2 class="text-xl font-semibold text-white">
+                {{ contact.first_name }} {{ contact.last_name }}
+              </h2>
+              <p class="text-gray-300 text-sm">{{ contact.email }} • {{ contact.phone }}</p>
+            </div>
+          </template>
         </div>
       </div>
 
@@ -186,9 +195,15 @@ const handleEditAddress = async () => {
             <select
               id="title"
               name="title"
-              class="w-full pl-10 pr-20 py-3 bg-gray-700 bg-opacity-50 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+              :class="[
+                isFetchingAddressData || isFetchingContactData
+                  ? 'opacity-50 cursor-not-allowed'
+                  : 'opacity-100 cursor-pointer',
+                'w-full pl-10 pr-20 py-3 bg-gray-700 bg-opacity-50 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200',
+              ]"
               placeholder="Enter your address type"
               required
+              :disabled="isFetchingAddressData || isFetchingContactData"
               v-model="address.title"
             >
               <option
@@ -213,9 +228,15 @@ const handleEditAddress = async () => {
               type="text"
               id="street"
               name="street"
-              class="w-full pl-10 pr-3 py-3 bg-gray-700 bg-opacity-50 border border-gray-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+              :class="[
+                isFetchingAddressData || isFetchingContactData
+                  ? 'opacity-50 cursor-not-allowed'
+                  : 'opacity-100',
+                'w-full pl-10 pr-3 py-3 bg-gray-700 bg-opacity-50 border border-gray-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200',
+              ]"
               placeholder="Enter street address"
               required
+              :disabled="isFetchingAddressData || isFetchingContactData"
               v-model="address.street"
             />
           </div>
@@ -232,9 +253,15 @@ const handleEditAddress = async () => {
                 type="text"
                 id="city"
                 name="city"
-                class="w-full pl-10 pr-3 py-3 bg-gray-700 bg-opacity-50 border border-gray-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+                :class="[
+                  isFetchingAddressData || isFetchingContactData
+                    ? 'opacity-50 cursor-not-allowed'
+                    : 'opacity-100',
+                  'w-full pl-10 pr-3 py-3 bg-gray-700 bg-opacity-50 border border-gray-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200',
+                ]"
                 placeholder="Enter city"
                 required
+                :disabled="isFetchingAddressData || isFetchingContactData"
                 v-model="address.city"
               />
             </div>
@@ -251,9 +278,15 @@ const handleEditAddress = async () => {
                 type="text"
                 id="province"
                 name="province"
-                class="w-full pl-10 pr-3 py-3 bg-gray-700 bg-opacity-50 border border-gray-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+                :class="[
+                  isFetchingAddressData || isFetchingContactData
+                    ? 'opacity-50 cursor-not-allowed'
+                    : 'opacity-100',
+                  'w-full pl-10 pr-3 py-3 bg-gray-700 bg-opacity-50 border border-gray-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200',
+                ]"
                 placeholder="Enter province or state"
                 required
+                :disabled="isFetchingAddressData || isFetchingContactData"
                 v-model="address.province"
               />
             </div>
@@ -273,9 +306,15 @@ const handleEditAddress = async () => {
                 type="text"
                 id="country"
                 name="country"
-                class="w-full pl-10 pr-3 py-3 bg-gray-700 bg-opacity-50 border border-gray-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+                :class="[
+                  isFetchingAddressData || isFetchingContactData
+                    ? 'opacity-50 cursor-not-allowed'
+                    : 'opacity-100',
+                  'w-full pl-10 pr-3 py-3 bg-gray-700 bg-opacity-50 border border-gray-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200',
+                ]"
                 placeholder="Enter country"
                 required
+                :disabled="isFetchingAddressData || isFetchingContactData"
                 v-model="address.country"
               />
             </div>
@@ -292,9 +331,15 @@ const handleEditAddress = async () => {
                 type="text"
                 id="postal_code"
                 name="postal_code"
-                class="w-full pl-10 pr-3 py-3 bg-gray-700 bg-opacity-50 border border-gray-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+                :class="[
+                  isFetchingAddressData || isFetchingContactData
+                    ? 'opacity-50 cursor-not-allowed'
+                    : 'opacity-100',
+                  'w-full pl-10 pr-3 py-3 bg-gray-700 bg-opacity-50 border border-gray-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200',
+                ]"
                 placeholder="Enter postal code"
                 required
+                :disabled="isFetchingAddressData || isFetchingContactData"
                 v-model="address.postal_code"
               />
             </div>

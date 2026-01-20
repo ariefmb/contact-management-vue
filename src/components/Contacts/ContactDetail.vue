@@ -4,6 +4,7 @@ import { alertError } from '@/lib/utils/alert'
 import { onBeforeMount, ref } from 'vue'
 import { useRoute } from 'vue-router'
 
+const isFetching = ref(false)
 const route = useRoute()
 const contactId = route.params.contactId
 
@@ -16,14 +17,21 @@ const contact = ref({
 })
 
 const fetchDetailContact = async () => {
-  const response = await contactRetrieveData(contactId)
+  isFetching.value = true
+  try {
+    const response = await contactRetrieveData(contactId)
 
-  if (!response.status) {
-    await alertError(response.errors)
-    return
+    if (!response.status) {
+      await alertError(response.errors)
+      return
+    }
+
+    contact.value = response.data
+  } catch (error) {
+    console.error(error)
+  } finally {
+    isFetching.value = false
   }
-
-  contact.value = response.data
 }
 
 onBeforeMount(async () => {
@@ -55,9 +63,16 @@ onBeforeMount(async () => {
         >
           <i class="fas fa-user text-3xl text-white"></i>
         </div>
-        <h2 class="text-2xl font-bold text-white mb-2">
-          {{ contact.first_name }} {{ contact.last_name }}
-        </h2>
+        <template v-if="isFetching">
+          <div class="flex items-center justify-center mb-2">
+            <h2 class="animate-pulse w-1/3 h-8 antialiased bg-gray-500 rounded-full"></h2>
+          </div>
+        </template>
+        <template v-else>
+          <h2 class="text-2xl font-bold text-white mb-2">
+            {{ contact.first_name }} {{ contact.last_name }}
+          </h2>
+        </template>
         <div class="w-24 h-1 bg-gradient mx-auto rounded-full"></div>
       </div>
 
@@ -65,43 +80,51 @@ onBeforeMount(async () => {
       <div class="space-y-5 mb-8">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
           <div
-            class="bg-gray-700 bg-opacity-50 p-5 rounded-lg shadow-md border border-gray-600 transition-all duration-200 hover:bg-opacity-70"
+            :class="[isFetching && 'opacity-50', 'bg-gray-700 bg-opacity-50 p-5 rounded-lg shadow-md border border-gray-600 transition-all duration-200 hover:bg-opacity-70']"
           >
             <div class="flex items-center mb-2">
               <i class="fas fa-user-tag text-blue-400 mr-2"></i>
               <h3 class="text-gray-300 text-sm font-medium">First Name</h3>
             </div>
-            <p class="text-white text-lg ml-6">{{ contact.first_name }}</p>
+            <p :class="[isFetching && 'h-7', 'text-white text-lg ml-6']">
+              {{ contact.first_name }}
+            </p>
           </div>
           <div
-            class="bg-gray-700 bg-opacity-50 p-5 rounded-lg shadow-md border border-gray-600 transition-all duration-200 hover:bg-opacity-70"
+            :class="[isFetching && 'opacity-50', 'bg-gray-700 bg-opacity-50 p-5 rounded-lg shadow-md border border-gray-600 transition-all duration-200 hover:bg-opacity-70']"
           >
             <div class="flex items-center mb-2">
               <i class="fas fa-user-tag text-blue-400 mr-2"></i>
               <h3 class="text-gray-300 text-sm font-medium">Last Name</h3>
             </div>
-            <p class="text-white text-lg ml-6">{{ contact.last_name }}</p>
+            <p :class="[isFetching && 'h-7', 'text-white text-lg ml-6']">
+              {{ contact.last_name }}
+            </p>
           </div>
         </div>
 
         <div
-          class="bg-gray-700 bg-opacity-50 p-5 rounded-lg shadow-md border border-gray-600 transition-all duration-200 hover:bg-opacity-70"
+          :class="[isFetching && 'opacity-50', 'bg-gray-700 bg-opacity-50 p-5 rounded-lg shadow-md border border-gray-600 transition-all duration-200 hover:bg-opacity-70']"
         >
           <div class="flex items-center mb-2">
             <i class="fas fa-envelope text-blue-400 mr-2"></i>
             <h3 class="text-gray-300 text-sm font-medium">Email</h3>
           </div>
-          <p class="text-white text-lg ml-6">{{ contact.email }}</p>
+          <p :class="[isFetching && 'h-7', 'text-white text-lg ml-6']">
+            {{ contact.email }}
+          </p>
         </div>
 
         <div
-          class="bg-gray-700 bg-opacity-50 p-5 rounded-lg shadow-md border border-gray-600 transition-all duration-200 hover:bg-opacity-70"
+          :class="[isFetching && 'opacity-50', 'bg-gray-700 bg-opacity-50 p-5 rounded-lg shadow-md border border-gray-600 transition-all duration-200 hover:bg-opacity-70']"
         >
           <div class="flex items-center mb-2">
             <i class="fas fa-phone text-blue-400 mr-2"></i>
             <h3 class="text-gray-300 text-sm font-medium">Phone</h3>
           </div>
-          <p class="text-white text-lg ml-6">{{ contact.phone }}</p>
+          <p :class="[isFetching && 'h-7', 'text-white text-lg ml-6']">
+            {{ contact.phone }}
+          </p>
         </div>
       </div>
 
