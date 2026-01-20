@@ -6,8 +6,8 @@ import { useUrlSearchParams } from '@vueuse/core'
 import { computed, onBeforeMount, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
-const isSearching = ref(false)
 const isLoading = ref(false)
+const isFetching = ref(false)
 const isSearchOpen = ref(false)
 const searchParams = useUrlSearchParams()
 const router = useRouter()
@@ -52,7 +52,6 @@ const handleDeleteContact = async (contactId) => {
 }
 
 const fetchContactsList = async () => {
-  isLoading.value = true
   try {
     const response = await contactRetrieveAllDatas({
       name: search.name,
@@ -70,27 +69,27 @@ const fetchContactsList = async () => {
     totalPage.value = response.paging.total_page || 1
   } catch (error) {
     console.error(error)
-  } finally {
-    isLoading.value = false
   }
 }
 
 const handleChangePage = async (value) => {
   if (value < 1 || value > totalPage.value) return
   page.value = value
+  isLoading.value = true
   await fetchContactsList()
+  isLoading.value = false
 }
 
 const handleSearch = async () => {
   try {
-    isSearching.value = true
+    isLoading.value = true
     page.value = 1
     await fetchContactsList()
     await router.replace({ query: queryParams.value })
   } catch (error) {
     console.error(error)
   } finally {
-    isSearching.value = false
+    isLoading.value = false
   }
 }
 
@@ -100,7 +99,9 @@ const toggleSearchVisibility = () => {
 
 onBeforeMount(async () => {
   isSearchOpen.value = Boolean(searchParams.name || searchParams.email || searchParams.phone)
+  isFetching.value = true
   await fetchContactsList()
+  isFetching.value = false
 })
 </script>
 
@@ -194,9 +195,9 @@ onBeforeMount(async () => {
             <button
               type="submit"
               class="px-5 py-3 bg-gradient text-white rounded-lg hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-800 transition-all duration-200 font-medium shadow-lg transform hover:-translate-y-0.5 cursor-pointer"
-              :disabled="isSearching"
+              :disabled="isLoading"
             >
-              <span v-if="isSearching" class="flex items-center justify-center">
+              <span v-if="isLoading" class="flex items-center justify-center">
                 <svg
                   class="mr-3 size-5 animate-spin text-white"
                   xmlns="http://www.w3.org/2000/svg"
@@ -247,14 +248,18 @@ onBeforeMount(async () => {
     </div>
 
     <!-- Contact Card -->
-    <template v-if="isLoading">
+    <template v-if="isFetching">
       <ContactListSkeleton />
     </template>
 
     <template v-else>
       <template v-if="contacts.length !== 0">
         <div
-          class="bg-gray-800 bg-opacity-80 rounded-xl shadow-custom border border-gray-700 overflow-hidden card-hover animate-fade-in"
+          :class="[
+            'bg-gray-800 bg-opacity-80',
+            isLoading ? 'opacity-50' : 'opacity-100',
+            'rounded-xl shadow-custom border border-gray-700 overflow-hidden card-hover animate-fade-in',
+          ]"
           v-for="contact in contacts"
           :key="contact.id"
         >
@@ -328,7 +333,7 @@ onBeforeMount(async () => {
     <nav
       class="flex items-center space-x-3 bg-gray-800 bg-opacity-80 rounded-xl shadow-custom border border-gray-700 p-3 animate-fade-in"
     >
-      <template v-if="isLoading">
+      <template v-if="isFetching">
         <div
           class="px-4 py-2 bg-gray-700 text-gray-300 rounded-lg hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-800 transition-all duration-200"
         >

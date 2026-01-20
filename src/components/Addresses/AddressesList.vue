@@ -113,9 +113,11 @@ onBeforeMount(async () => {
               </div>
             </template>
             <div class="space-y-3 text-gray-300 ml-2 mb-4">
-              <p class="flex items-center">
-                <i class="fas fa-road text-gray-500 w-6"></i>
-                <span class="font-medium w-24">Street</span>
+              <p class="flex items-start">
+                <span class="flex items-center">
+                  <i class="fas fa-road text-gray-500 w-6"></i>
+                  <span class="font-medium w-24">Street</span>
+                </span>
                 <span class="mr-1">:</span>
                 <span>{{ address.street }}</span>
               </p>
