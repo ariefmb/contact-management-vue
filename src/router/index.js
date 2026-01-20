@@ -56,22 +56,10 @@ const router = createRouter({
         {
           path: '',
           component: () => import('@/components/Contacts/ContactsList.vue'),
-          children: [
-            {
-              path: '',
-              component: () => import('@/components/Skeleton/Contacts/ContactListSkeleton.vue'),
-            },
-          ],
         },
         {
           path: 'contacts',
           component: () => import('@/components/Contacts/ContactsList.vue'),
-          children: [
-            {
-              path: '',
-              component: () => import('@/components/Skeleton/Contacts/ContactListSkeleton.vue'),
-            },
-          ],
         },
         {
           path: 'contacts/create',

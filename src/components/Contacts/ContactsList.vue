@@ -1,57 +1,58 @@
 <script setup>
+import ContactListSkeleton from '@/components/Skeleton/Contacts/ContactListSkeleton.vue'
 import { contactRemove, contactRetrieveAllDatas } from '@/lib/api/ContactApi'
 import { alertConfirm, alertError, alertSuccess } from '@/lib/utils/alert'
 import { useUrlSearchParams } from '@vueuse/core'
-import { onBeforeMount, onMounted, reactive, ref, watch } from 'vue'
+import { computed, onBeforeMount, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
 const isSearching = ref(false)
 const isLoading = ref(false)
+const isSearchOpen = ref(false)
 const searchParams = useUrlSearchParams()
 const router = useRouter()
 
 const search = reactive({
-  name: searchParams.name,
-  email: searchParams.email,
-  phone: searchParams.phone,
+  name: searchParams.name || '',
+  email: searchParams.email || '',
+  phone: searchParams.phone || '',
 })
 
 const page = ref(1)
 const totalPage = ref(1)
-const pages = ref([1])
+
+const pages = computed(() => Array.from({ length: totalPage.value }, (_, idx) => idx + 1))
+
+const queryParams = computed(() => {
+  const query = {}
+  if (search.name) query.name = search.name
+  if (search.email) query.email = search.email
+  if (search.phone) query.phone = search.phone
+  return query
+})
 
 const contacts = ref([])
 
-watch(totalPage, (value) => {
-  const data = []
-  for (let i = 1; i <= value; i++) {
-    data.push(i)
-  }
-  pages.value = data
-})
-
 const handleDeleteContact = async (contactId) => {
   try {
-    await alertConfirm('This contact will be remove!', 'Yes, remove it').then(async (result) => {
-      if (result.isConfirmed) {
-        const response = await contactRemove(contactId)
+    const result = await alertConfirm('This contact will be remove!', 'Yes, remove it')
+    if (!result.isConfirmed) return
 
-        if (!response.status) {
-          await alertError(response.errors)
-        }
+    const response = await contactRemove(contactId)
+    if (!response.status) {
+      await alertError(response.errors)
+      return
+    }
 
-        await alertSuccess('Successfully remove contact')
-        isLoading.value = true
-        await fetchContactsList()
-        isLoading.value = false
-      }
-    })
+    await alertSuccess('Successfully remove contact')
+    await fetchContactsList()
   } catch (error) {
-    console.error(error.message)
+    console.error(error)
   }
 }
 
 const fetchContactsList = async () => {
+  isLoading.value = true
   try {
     const response = await contactRetrieveAllDatas({
       name: search.name,
@@ -66,13 +67,16 @@ const fetchContactsList = async () => {
     }
 
     contacts.value = response.data
-    totalPage.value = response.paging.total_page
+    totalPage.value = response.paging.total_page || 1
   } catch (error) {
-    console.error(error.message)
+    console.error(error)
+  } finally {
+    isLoading.value = false
   }
 }
 
 const handleChangePage = async (value) => {
+  if (value < 1 || value > totalPage.value) return
   page.value = value
   await fetchContactsList()
 }
@@ -80,60 +84,23 @@ const handleChangePage = async (value) => {
 const handleSearch = async () => {
   try {
     isSearching.value = true
-    isLoading.value = true
-
     page.value = 1
     await fetchContactsList()
-
-    const query = {}
-    if (search.name) query.name = search.name
-    if (search.email) query.email = search.email
-    if (search.phone) query.phone = search.phone
-
-    router.push({
-      query,
-    })
+    await router.replace({ query: queryParams.value })
   } catch (error) {
-    console.error(error.message)
+    console.error(error)
   } finally {
     isSearching.value = false
-    isLoading.value = false
   }
 }
 
+const toggleSearchVisibility = () => {
+  isSearchOpen.value = !isSearchOpen.value
+}
+
 onBeforeMount(async () => {
-  isLoading.value = true
+  isSearchOpen.value = Boolean(searchParams.name || searchParams.email || searchParams.phone)
   await fetchContactsList()
-  isLoading.value = false
-})
-
-onMounted(() => {
-  const toggleButton = document.getElementById('toggleSearchForm')
-  const searchFormContent = document.getElementById('searchFormContent')
-  const toggleIcon = document.getElementById('toggleSearchIcon')
-
-  searchFormContent.style.transition =
-    'max-height 0.3s ease-in-out, opacity 0.3s ease-in-out, margin 0.3s ease-in-out'
-  searchFormContent.style.overflow = 'hidden'
-  searchFormContent.style.maxHeight = '0px'
-  searchFormContent.style.opacity = '0'
-  searchFormContent.style.marginTop = '0'
-
-  toggleButton.addEventListener('click', function () {
-    if (searchFormContent.style.maxHeight !== '0px') {
-      searchFormContent.style.maxHeight = '0px'
-      searchFormContent.style.opacity = '0'
-      searchFormContent.style.marginTop = '0'
-      toggleIcon.classList.remove('fa-chevron-up')
-      toggleIcon.classList.add('fa-chevron-down')
-    } else {
-      searchFormContent.style.maxHeight = searchFormContent.scrollHeight + 'px'
-      searchFormContent.style.opacity = '1'
-      searchFormContent.style.marginTop = '1rem'
-      toggleIcon.classList.remove('fa-chevron-down')
-      toggleIcon.classList.add('fa-chevron-up')
-    }
-  })
 })
 </script>
 
@@ -147,104 +114,117 @@ onMounted(() => {
   <div
     class="bg-gray-800 bg-opacity-80 rounded-xl shadow-custom border border-gray-700 p-6 mb-8 animate-fade-in"
   >
-    <div id="toggleSearchForm" class="flex items-center justify-between mb-4 cursor-pointer">
+    <div
+      @click="toggleSearchVisibility"
+      class="flex items-center justify-between mb-4 cursor-pointer"
+    >
       <div class="flex items-center">
         <i class="fas fa-search text-blue-400 mr-3"></i>
         <h2 class="text-xl font-semibold text-white">Search Contacts</h2>
       </div>
       <button
         type="button"
+        :aria-expanded="isSearchOpen"
         class="text-gray-300 hover:text-white hover:bg-gray-700 p-2 rounded-full focus:outline-none transition-all duration-200 cursor-pointer"
       >
-        <i class="fas fa-chevron-down text-lg" id="toggleSearchIcon"></i>
+        <i :class="['fas', isSearchOpen ? 'fa-chevron-up' : 'fa-chevron-down', 'text-lg']"></i>
       </button>
     </div>
-    <div id="searchFormContent" class="mt-4">
-      <form @submit.prevent="handleSearch">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
-          <div>
-            <label for="name" class="block text-gray-300 text-sm font-medium mb-2">Name</label>
-            <div class="relative">
-              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <i class="fas fa-user text-gray-500"></i>
+    <Transition
+      enter-active-class="transition-all duration-[.8s] ease-out"
+      enter-from-class="opacity-0 max-h-0 overflow-hidden"
+      enter-to-class="opacity-100 max-h-96"
+      leave-active-class="transition-all duration-300 ease-in"
+      leave-from-class="opacity-100 max-h-96"
+      leave-to-class="opacity-0 max-h-0 overflow-hidden"
+    >
+      <div v-show="isSearchOpen" class="mt-4">
+        <form @submit.prevent="handleSearch">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+            <div>
+              <label for="name" class="block text-gray-300 text-sm font-medium mb-2">Name</label>
+              <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <i class="fas fa-user text-gray-500"></i>
+                </div>
+                <input
+                  type="text"
+                  id="name"
+                  name="name"
+                  class="w-full pl-10 pr-3 py-3 bg-gray-700 bg-opacity-50 border border-gray-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+                  placeholder="Search by name"
+                  v-model.lazy="search.name"
+                />
               </div>
-              <input
-                type="text"
-                id="name"
-                name="name"
-                class="w-full pl-10 pr-3 py-3 bg-gray-700 bg-opacity-50 border border-gray-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
-                placeholder="Search by name"
-                v-model.lazy="search.name"
-              />
+            </div>
+            <div>
+              <label for="email" class="block text-gray-300 text-sm font-medium mb-2">Email</label>
+              <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <i class="fas fa-envelope text-gray-500"></i>
+                </div>
+                <input
+                  type="text"
+                  id="email"
+                  name="email"
+                  class="w-full pl-10 pr-3 py-3 bg-gray-700 bg-opacity-50 border border-gray-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+                  placeholder="Search by email"
+                  v-model.lazy="search.email"
+                />
+              </div>
+            </div>
+            <div>
+              <label for="phone" class="block text-gray-300 text-sm font-medium mb-2">Phone</label>
+              <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <i class="fas fa-phone text-gray-500"></i>
+                </div>
+                <input
+                  type="text"
+                  id="phone"
+                  name="phone"
+                  class="w-full pl-10 pr-3 py-3 bg-gray-700 bg-opacity-50 border border-gray-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+                  placeholder="Search by phone"
+                  v-model.lazy="search.phone"
+                />
+              </div>
             </div>
           </div>
-          <div>
-            <label for="email" class="block text-gray-300 text-sm font-medium mb-2">Email</label>
-            <div class="relative">
-              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <i class="fas fa-envelope text-gray-500"></i>
-              </div>
-              <input
-                type="text"
-                id="email"
-                name="email"
-                class="w-full pl-10 pr-3 py-3 bg-gray-700 bg-opacity-50 border border-gray-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
-                placeholder="Search by email"
-                v-model.lazy="search.email"
-              />
-            </div>
+          <div class="mt-5 text-right">
+            <button
+              type="submit"
+              class="px-5 py-3 bg-gradient text-white rounded-lg hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-800 transition-all duration-200 font-medium shadow-lg transform hover:-translate-y-0.5 cursor-pointer"
+              :disabled="isSearching"
+            >
+              <span v-if="isSearching" class="flex items-center justify-center">
+                <svg
+                  class="mr-3 size-5 animate-spin text-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    class="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    stroke-width="4"
+                  ></circle>
+                  <path
+                    class="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  ></path>
+                </svg>
+                Searching...
+              </span>
+              <span v-else> <i class="fas fa-search mr-2"></i> Search </span>
+            </button>
           </div>
-          <div>
-            <label for="phone" class="block text-gray-300 text-sm font-medium mb-2">Phone</label>
-            <div class="relative">
-              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <i class="fas fa-phone text-gray-500"></i>
-              </div>
-              <input
-                type="text"
-                id="phone"
-                name="phone"
-                class="w-full pl-10 pr-3 py-3 bg-gray-700 bg-opacity-50 border border-gray-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
-                placeholder="Search by phone"
-                v-model.lazy="search.phone"
-              />
-            </div>
-          </div>
-        </div>
-        <div class="mt-5 text-right">
-          <button
-            type="submit"
-            class="px-5 py-3 bg-gradient text-white rounded-lg hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-800 transition-all duration-200 font-medium shadow-lg transform hover:-translate-y-0.5 cursor-pointer"
-            :disabled="isSearching"
-          >
-            <span v-if="isSearching" class="flex items-center justify-center">
-              <svg
-                class="mr-3 size-5 animate-spin text-white"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-              >
-                <circle
-                  class="opacity-25"
-                  cx="12"
-                  cy="12"
-                  r="10"
-                  stroke="currentColor"
-                  stroke-width="4"
-                ></circle>
-                <path
-                  class="opacity-75"
-                  fill="currentColor"
-                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                ></path>
-              </svg>
-              Searching...
-            </span>
-            <span v-else> <i class="fas fa-search mr-2"></i> Search </span>
-          </button>
-        </div>
-      </form>
-    </div>
+        </form>
+      </div>
+    </Transition>
   </div>
 
   <!-- Contact cards grid -->
@@ -268,7 +248,7 @@ onMounted(() => {
 
     <!-- Contact Card -->
     <template v-if="isLoading">
-      <RouterView />
+      <ContactListSkeleton />
     </template>
 
     <template v-else>
@@ -339,6 +319,7 @@ onMounted(() => {
           </div>
         </div>
       </template>
+      <p v-else class="text-center text-gray-400 col-span-full">No contacts found.</p>
     </template>
   </div>
 

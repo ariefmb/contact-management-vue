@@ -30,7 +30,7 @@ const handleLogoutButton = async () => {
 
         removeUserDataFromSessionStorage()
         removeAllTokenFromCookies()
-        
+
         await alertError('Failed to logout, clearing local session...')
         await router.replace({
           path: '/login',
@@ -84,7 +84,7 @@ const handleLogoutButton = async () => {
 
       <!-- Footer -->
       <div class="mt-10 mb-6 text-center text-gray-400 text-sm animate-fade-in">
-        <p>© 2025 Contact Management. All rights reserved.</p>
+        <p>© 2026 Contact Management - by ariefmb. All rights reserved.</p>
       </div>
     </main>
   </div>
