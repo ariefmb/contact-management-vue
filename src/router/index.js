@@ -1,20 +1,10 @@
-import AddressAdd from '@/components/Addresses/AddressAdd.vue'
-import AddressEdit from '@/components/Addresses/AddressEdit.vue'
-import AddressesList from '@/components/Addresses/AddressesList.vue'
-import ContactCreate from '@/components/Contacts/ContactCreate.vue'
-import ContactDetail from '@/components/Contacts/ContactDetail.vue'
-import ContactEdit from '@/components/Contacts/ContactEdit.vue'
-import ContactsList from '@/components/Contacts/ContactsList.vue'
 import GuestAddressesList from '@/components/Guest/GuestAddressesList.vue'
 import GuestContactDetail from '@/components/Guest/GuestContactDetail.vue'
 import GuestContactList from '@/components/Guest/GuestContactList.vue'
-import ContactListSkeleton from '@/components/Skeleton/Contacts/ContactListSkeleton.vue'
 import GuestContactListSkeleton from '@/components/Skeleton/Guest/GuestContactListSkeleton.vue'
 import UserLogin from '@/components/User/UserLogin.vue'
-import UserProfile from '@/components/User/UserProfile.vue'
 import UserRegister from '@/components/User/UserRegister.vue'
 import { getAccessToken } from '@/lib/utils/tokenAndSession'
-import DashboardLayoutViews from '@/views/DashboardLayoutViews.vue'
 import LayoutViews from '@/views/LayoutViews.vue'
 import { createRouter, createWebHistory } from 'vue-router'
 
@@ -56,58 +46,58 @@ const router = createRouter({
       ],
     },
     {
-      component: DashboardLayoutViews,
+      component: () => import('@/views/DashboardLayoutViews.vue'),
       path: '/dashboard',
       children: [
         {
           path: 'users/profile',
-          component: UserProfile,
+          component: () => import('@/components/User/UserProfile.vue'),
         },
         {
           path: '',
-          component: ContactsList,
+          component: () => import('@/components/Contacts/ContactsList.vue'),
           children: [
             {
               path: '',
-              component: ContactListSkeleton,
+              component: () => import('@/components/Skeleton/Contacts/ContactListSkeleton.vue'),
             },
           ],
         },
         {
           path: 'contacts',
-          component: ContactsList,
+          component: () => import('@/components/Contacts/ContactsList.vue'),
           children: [
             {
               path: '',
-              component: ContactListSkeleton,
+              component: () => import('@/components/Skeleton/Contacts/ContactListSkeleton.vue'),
             },
           ],
         },
         {
           path: 'contacts/create',
-          component: ContactCreate,
+          component: () => import('@/components/Contacts/ContactCreate.vue'),
         },
         {
           path: 'contacts/:contactId',
-          component: ContactDetail,
+          component: () => import('@/components/Contacts/ContactDetail.vue'),
           children: [
             {
               path: '',
-              component: AddressesList,
+              component: () => import('@/components/Addresses/AddressesList.vue'),
             },
           ],
         },
         {
           path: 'contacts/:contactId/edit',
-          component: ContactEdit,
+          component: () => import('@/components/Contacts/ContactEdit.vue'),
         },
         {
           path: 'contacts/:contactId/addresses/add',
-          component: AddressAdd,
+          component: () => import('@/components/Addresses/AddressAdd.vue'),
         },
         {
           path: 'contacts/:contactId/addresses/:addressId/edit',
-          component: AddressEdit,
+          component: () => import('@/components/Addresses/AddressEdit.vue'),
         },
       ],
     },
