@@ -1,16 +1,22 @@
-<div align="center" style="overflow: hidden; border-radius: 20px">
-
-![Banner](public/img/banner.png)
+<div align="center" >
+  <img src="public/img/banner.png" alt="Banner" style="max-width: 100%; border-radius: 20px 20px 0 0" />
 </div>
 
 <div align="center">
+<br/>
 
 [![Vue 3](https://img.shields.io/badge/Vue-3-4FC08D?style=flat&logo=vue.js)](https://vuejs.org/) [![Vue Router](https://img.shields.io/badge/Vue%20Router-4-4FC08D?style=flat&logo=vue.js)](https://router.vuejs.org/) [![Vite](https://img.shields.io/badge/Vite-7-646CFF?style=flat&logo=vite)](https://vitejs.dev/) [![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-4-06B6D4?style=flat&logo=tailwindcss)](https://tailwindcss.com/) [![Axios](https://img.shields.io/badge/Axios-1.x-5A29E4?style=flat&logo=axios)](https://axios-http.com/) [![SweetAlert2](https://img.shields.io/badge/SweetAlert2-11-FC6D26?style=flat&logo=javascript)](https://sweetalert2.github.io/)
+
 </div>
 
 A Vue 3 single-page application demonstrating modern frontend architecture with guest browsing, JWT-based authentication, and full CRUD operations for contacts and addresses. Built as a portfolio project to showcase practical Vue.js skills and frontend engineering decisions.
 
 **Live Features:** Public contact directory, user registration/login with token refresh, protected dashboard with contact/address management, profile updates, and optimized lazy-loaded routes.
+<br/>
+<div align="center">
+
+[![Live Demo](https://img.shields.io/badge/🚀_Live_Demo-Visit_App-00C7B7?style=for-the-badge&logoColor=white)](https://contact-management-ariefmb.vercel.app/)
+</div>
 
 ---
 
@@ -80,7 +86,7 @@ This is a **personal learning and portfolio project** built to demonstrate:
 
 **Developer Experience**
 
-- [![ESLint](https://img.shields.io/badge/ESLint-9-4B3FBF?style=flat&logo=eslint)](https://eslint.org/)  [![Prettier](https://img.shields.io/badge/Prettier-3-F7B93E?style=flat&logo=prettier)](https://prettier.io/) Code quality and consistent formatting
+- [![ESLint](https://img.shields.io/badge/ESLint-9-4B3FBF?style=flat&logo=eslint)](https://eslint.org/) [![Prettier](https://img.shields.io/badge/Prettier-3-F7B93E?style=flat&logo=prettier)](https://prettier.io/) Code quality and consistent formatting
 
 ---
 
