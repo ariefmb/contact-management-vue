@@ -46,10 +46,8 @@ const handleSubmit = async () => {
     <div
       class="animate-fade-in bg-gray-800 bg-opacity-80 p-8 rounded-xl shadow-custom border border-gray-700 backdrop-blur-sm w-full max-w-md"
     >
-      <div class="text-center mb-8">
-        <div class="inline-block p-3 bg-gradient rounded-full mb-4">
-          <i class="fas fa-address-book text-3xl text-white"></i>
-        </div>
+      <div class="mb-8 flex-col justify-items-center">
+        <img src="/img/cover-icon.png" alt="contact-management icon" width="100" />
         <h1 class="text-3xl font-bold text-white">Contact Management</h1>
         <p class="text-gray-300 mt-2">Sign in to your account</p>
       </div>

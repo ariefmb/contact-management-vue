@@ -14,7 +14,7 @@ const router = useRouter()
           class="flex items-center hover:opacity-90 transition-opacity duration-200 gap-2"
         >
           <img
-            src="../../public/img/contact-management-icon.png"
+            src="/img/contact-management-icon.png"
             alt="contact-management icon"
             class="max-h-6"
           />
